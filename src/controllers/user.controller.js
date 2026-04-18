@@ -182,3 +182,7 @@ module.exports = {
   updateStatus,
   updateCustomerProfile
 };
+
+// Auth -> 1. email and phone verification..
+      //   2.  forgat password email verification
+      //   3. change phone number verification 

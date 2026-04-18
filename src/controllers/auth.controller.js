@@ -1,22 +1,48 @@
 const { StatusCodes } = require("http-status-codes");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { constant, userStatuses } = require("../utils");
-const { User, Token } = require("../models");
+const { constant, userStatuses, generateOtp } = require("../utils");
+const { User, Token, OTP } = require("../models");
 const { serverConfig } = require("../config");
+const { sendOtpEmail } = require("../services");
+const { purpose } = require("../utils/Constant");
 
 const signUp = async (req, res) => {
   try {
-    const { email, password, firstName, lastName, phoneNumber, role } =
+    const { email,otp, password, firstName, lastName, phoneNumber, role } =
       req.body;
+
+    const record = await OTP.findOne({
+      email,
+      otp,
+      purpose: "REGISTER",
+    });
+
+    if (!record) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+
+    if (record.expiresAt < new Date()) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP expired",
+      });
+    }
+
+    // hash password
+    const hashPassword = await bcrypt.hash(password, 10);
 
     const finalUserRole = role || constant.user;
     const status =
       finalUserRole === constant.user
         ? userStatuses.approved
         : userStatuses.pending;
+
     // hash Password
-    const hashPassword = await bcrypt.hash(password, 10);
+    // const hashPassword = await bcrypt.hash(password, 10);
 
     // Create New User
     const newUser = await User.create({
@@ -27,23 +53,15 @@ const signUp = async (req, res) => {
       phoneNumber,
       role: finalUserRole,
       userStatus: status,
+      emailVerified: true,
     });
     res.status(StatusCodes.CREATED).json({
       success: true,
       message: "User Create Successfully",
-      data: {
-        email: newUser.email,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        phoneNumber: newUser.phoneNumber,
-        role: newUser.role,
-        userStatus: newUser.userStatus,
-        createdAt: newUser.createdAt,
-      },
+      data: newUser,
     });
   } catch (error) {
     console.error("Error while creating user:", error);
-
     // Handle duplicate key error (MongoDB unique constraint)
     if (error.code === 11000) {
       const duplicateField = Object.keys(error.keyValue)[0];
@@ -52,7 +70,6 @@ const signUp = async (req, res) => {
         message: `User with this ${duplicateField} already exists.`,
       });
     }
-
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Internal server error while creating the user",
@@ -72,6 +89,12 @@ const login = async (req, res) => {
 
     // find the Email is exist in database or not..
     const user = await User.findOne({ email }).select("+password");
+    if (!user.emailVerified) {
+      return res.status(403).json({
+        success: false,
+        message: "Please verify your email first",
+      });
+    }
     if (!user) {
       return res.status(StatusCodes.NOT_FOUND).json({
         success: false,
@@ -182,10 +205,49 @@ const logout = async (req, res, next) => {
   }
 };
 
+const sendRegisterOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // check if already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+
+    const otp = generateOtp();
+
+    await OTP.deleteMany({
+      email,
+      purpose: purpose.register,
+    });
+
+    await OTP.create({
+      email,
+      otp,
+      purpose: "REGISTER",
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+    });
+
+    await sendOtpEmail(email, otp);
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: "OTP sent successfully",
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 module.exports = {
   signUp,
   login,
   logout,
+  sendRegisterOtp,
 };
 
 // forgot password

@@ -73,6 +73,10 @@ const userSchema = new mongoose.Schema(
       ref: "AirLines",
       required: false,
     },
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    }, 
     loyaltyPoints: {
       type: Number,
       min: 0,

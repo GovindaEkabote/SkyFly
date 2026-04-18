@@ -1,3 +1,4 @@
+const { sendOtpEmail } = require("./email.service");
 const {
   updateEmployeeDetails,
   updatePilotDetails,
@@ -22,4 +23,5 @@ module.exports = {
   deleteUserById: deleteUserById,
   updateUserStatus: updateUserStatus,
   updatecustomerProfile: updatecustomerProfile,
+  sendOtpEmail: sendOtpEmail
 };

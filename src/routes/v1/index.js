@@ -12,6 +12,7 @@ router.post(
 
 router.get("/login", authController.login);
 router.get("/logout", authController.logout)
+router.post("/auth/send-register-otp", authController.sendRegisterOtp)
 
 module.exports = router;
 

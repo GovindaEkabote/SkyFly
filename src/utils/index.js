@@ -1,5 +1,7 @@
 // utils/index.js
 const constants = require("./Constant/index");
+const transporter = require("./emailService");
+const generateOtp = require("./otp");
 
 module.exports = {
   constant: constants.userRoles,
@@ -9,5 +11,9 @@ module.exports = {
   bloodGroup: constants.bloodGroup,
   empType: constants.empType,
   licenseType: constants.licenseType,
-  pilotStatus:constants.pilotStatus
+  pilotStatus: constants.pilotStatus,
+  purpose: constants.purpose,
+  transporter: transporter,
+  generateOtp:generateOtp
+
 };
