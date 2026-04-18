@@ -5,11 +5,11 @@ const { constant, userStatuses, generateOtp } = require("../utils");
 const { User, Token, OTP } = require("../models");
 const { serverConfig } = require("../config");
 const { sendOtpEmail } = require("../services");
-const { purpose } = require("../utils/Constant");
+const { purpose } = require("../utils");
 
 const signUp = async (req, res) => {
   try {
-    const { email,otp, password, firstName, lastName, phoneNumber, role } =
+    const { email, otp, password, firstName, lastName, phoneNumber, role } =
       req.body;
 
     const record = await OTP.findOne({
@@ -243,11 +243,149 @@ const sendRegisterOtp = async (req, res) => {
   }
 };
 
+const sendChangeEmailOtp = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { newEmail } = req.body;
+
+    // check if email already exists
+    const existingUser = await User.findOne({ email: newEmail });
+    if (existingUser) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "Email already in use",
+      });
+    }
+    const otp = generateOtp();
+    await OTP.deleteMany({ email: newEmail, purpose: purpose.changeEmail });
+    await OTP.create({
+      userId,
+      email: newEmail,
+      otp,
+      purpose: purpose.changeEmail,
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+    });
+
+    await sendOtpEmail(newEmail, otp);
+
+    return res.json({
+      success: true,
+      message: "OTP sent to new email",
+    });
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: error.message });
+  }
+};
+
+const verifyChangeEmailOtp = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { newEmail, otp } = req.body;
+
+    const record = await OTP.findOne({
+      userId,
+      email: newEmail,
+      otp,
+      purpose: "CHANGE_EMAIL",
+    });
+
+    if (!record) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+
+    if (record.expiresAt < new Date()) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "OTP expired",
+      });
+    }
+
+    await User.findByIdAndUpdate(userId, {
+      email: newEmail,
+      emailVerified: true,
+    });
+
+    await OTP.deleteOne({ _id: record._id });
+
+    return res.json({
+      success: true,
+      message: "Email updated successfully",
+    });
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: error.message });
+  }
+};
+
+const sendForgotPasswordOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    const otp = generateOtp();
+
+    await OTP.create({
+      email,
+      otp,
+      purpose: purpose.forgotPassword,
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+    });
+    await sendOtpEmail(email, otp);
+
+    res.json({ success: true, message: "OTP sent" });
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: error.message });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    const record = await OTP.create({
+      email,
+      otp,
+      purpose: purpose.forgotPassword,
+    });
+    if (!record) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await User.updateOne({ email }, { password: hashedPassword });
+    await OTP.deleteOne({ _id: record._id });
+    res.json({ success: true, message: "Password updated" });
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   signUp,
   login,
   logout,
   sendRegisterOtp,
+  sendChangeEmailOtp,
+  verifyChangeEmailOtp,
+  sendForgotPasswordOtp,
+  resetPassword,
 };
 
 // forgot password
