@@ -33,6 +33,23 @@ const updateUserStatus = async (userId, userStatus) => {
   return await userRepository.updateUserById(userId, { userStatus });
 };
 
+const updatecustomerProfile = async (userId, data) => {
+  const allowedFields = ["firstName", "lastName", "email", "phoneNumber"];
+
+  const filteredData = {};
+
+  for (let key of allowedFields) {
+    if (data[key] !== undefined) {
+      filteredData[key] = data[key];
+    }
+  }
+  if (Object.keys(filteredData).length === 0) {
+    throw new Error("No valid fields provided for update");
+  }
+
+  return await userRepository.updateUserById(userId, filteredData);
+};
+
 const getUserById = async (userId) => {
   const user = await userRepository.getUserById(userId);
   if (!user) {
@@ -68,4 +85,5 @@ module.exports = {
   getUsers,
   deleteUserById,
   updateUserStatus,
+  updatecustomerProfile,
 };

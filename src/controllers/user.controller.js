@@ -142,6 +142,35 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const updateCustomerProfile = async (req, res) => {
+  try {
+    const userID = req.user.id;
+
+    const updatedProfile = await userService.updatecustomerProfile(
+      userID,
+      req.body
+    );
+
+    if (!updatedProfile) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: updatedProfile,
+    });
+  } catch (error) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   updateEmployeeDetails,
   updatePilotDetails,
@@ -151,4 +180,5 @@ module.exports = {
   getUsers,
   deleteUser,
   updateStatus,
+  updateCustomerProfile
 };

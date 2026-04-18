@@ -9,6 +9,7 @@ const {
   getUsers,
   deleteUser,
   updateStatus,
+  updateCustomerProfile
 } = require("../../controllers");
 const { constant } = require("../../utils");
 const {
@@ -78,6 +79,13 @@ router.put(
   token,
   roleBasedAuth(constant.airline_admin, constant.super_admin),
   updateStatus,
+);
+
+router.put(
+  "/update/customer/profile",
+  token,
+  roleBasedAuth(constant.user),
+  updateCustomerProfile,
 );
 
 module.exports = router;

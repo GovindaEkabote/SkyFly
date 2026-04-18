@@ -7,6 +7,7 @@ const {
   getUsers,
   deleteUser,
   updateStatus,
+  updateCustomerProfile,
 } = require("./user.controller");
 
 module.exports = {
@@ -19,4 +20,5 @@ module.exports = {
   getUsers,
   deleteUser,
   updateStatus,
+  updateCustomerProfile,
 };
