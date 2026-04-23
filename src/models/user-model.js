@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { constant, userStatuses, loyaltyTiers } = require("../utils");
+const { constant, userStatuses, loyaltyTiers, documents } = require("../utils");
 const employeeDetailsSchema = require("./Schemas/employeeDetails.schema");
 const pilotDetailsSchema = require("./Schemas/pilotDetails.schema");
 const personalDetailsSchema = require("./Schemas/personalDetails.schema");
@@ -46,6 +46,38 @@ const userSchema = new mongoose.Schema(
       unique: true,
       match: [/^\+?[1-9]\d{1,14}$/, "Invalid phone number format"],
     },
+    profilePicture: {
+      url: String,
+      publichId: String,
+      cloudinaryUrl: String,
+    },
+    documents: [
+      {
+        type: {
+          type: String,
+          enum: [
+            documents.password,
+            documents.IdCard,
+            documents.license,
+            documents.certificate,
+            documents.education,
+            documents.exprienceLetter,
+            documents.other,
+          ],
+          required: true,
+        },
+        url: String,
+        publicId: String,
+        uploadedAt: {
+          type: Date,
+          default: Date.now,
+        },
+        verified: {
+          type: Boolean,
+          default: false,
+        },
+      },
+    ],
     role: {
       type: String,
       enum: [
@@ -54,6 +86,7 @@ const userSchema = new mongoose.Schema(
         constant.pilot,
         constant.super_admin,
         constant.staff,
+        constant.AirHostess,
       ],
       default: constant.user,
     },
@@ -76,7 +109,7 @@ const userSchema = new mongoose.Schema(
     emailVerified: {
       type: Boolean,
       default: false,
-    }, 
+    },
     loyaltyPoints: {
       type: Number,
       min: 0,

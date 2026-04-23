@@ -10,6 +10,8 @@ const {
   deleteUserById,
   updateUserStatus,
   updatecustomerProfile,
+  uodateUserById,
+  updateProfilePicture,
 } = require("./user.service");
 
 module.exports = {
@@ -23,5 +25,7 @@ module.exports = {
   deleteUserById: deleteUserById,
   updateUserStatus: updateUserStatus,
   updatecustomerProfile: updatecustomerProfile,
-  sendOtpEmail: sendOtpEmail
+  sendOtpEmail: sendOtpEmail,
+  uodateUserById: uodateUserById,
+  updateProfilePicture: updateProfilePicture,
 };

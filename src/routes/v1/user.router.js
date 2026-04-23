@@ -9,7 +9,8 @@ const {
   getUsers,
   deleteUser,
   updateStatus,
-  updateCustomerProfile
+  updateCustomerProfile,
+  uploadUserProfilePicture,
 } = require("../../controllers");
 const { constant } = require("../../utils");
 const {
@@ -17,6 +18,7 @@ const {
   validateUserStatus,
   token,
   roleBasedAuth,
+  uploadUserProfile,
 } = require("../../middlewares");
 
 router.patch(
@@ -88,8 +90,11 @@ router.put(
   updateCustomerProfile,
 );
 
-module.exports = router;
+router.post(
+  "/user/profile-picture",
+  token,
+  uploadUserProfile,
+  uploadUserProfilePicture,
+);
 
-// super admin update userStatus --> api
-// customer update user name, phone number, email, etc
-// PATCH /users/:id/status → block/approve user
+module.exports = router;

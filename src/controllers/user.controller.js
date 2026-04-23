@@ -1,6 +1,7 @@
 const { constant, userStatuses } = require("../utils");
 const userService = require("../services");
 const { StatusCodes } = require("http-status-codes");
+const { cloudinary_js_config } = require("../config");
 
 const updateEmployeeDetails = async (req, res) => {
   try {
@@ -148,7 +149,7 @@ const updateCustomerProfile = async (req, res) => {
 
     const updatedProfile = await userService.updatecustomerProfile(
       userID,
-      req.body
+      req.body,
     );
 
     if (!updatedProfile) {
@@ -171,6 +172,44 @@ const updateCustomerProfile = async (req, res) => {
   }
 };
 
+const uploadUserProfilePicture  = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ error: "No file uploaded" });
+    }
+    const user = await userService.getUserById(req.user.id);userService.uodateUserById
+
+    if (user.profilePicture && user.profilePicture.publichId) {
+      await cloudinary_js_config.uploader.destroy(
+        user.profilePicture.publichId,
+      );
+    }
+    // Update user with new profile picture
+    const updatedUser = await userService.uodateUserById(
+      req.user.id,
+      {
+        profilePicture: {
+          url: req.file.path,
+          publicId: req.file.filename,
+          cloudinaryUrl: req.file.path,
+        },
+      },
+      { new: true },
+    );
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Profile picture uploaded successfully",
+      data: { profilePicture: updatedUser.profilePicture },
+    });
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: error.message });
+  }
+};
+
 module.exports = {
   updateEmployeeDetails,
   updatePilotDetails,
@@ -180,9 +219,10 @@ module.exports = {
   getUsers,
   deleteUser,
   updateStatus,
-  updateCustomerProfile
+  updateCustomerProfile,
+  uploadUserProfilePicture ,
 };
 
 // Auth -> 1. email and phone verification..
-      //   2.  forgat password email verification
-      //   3. change phone number verification 
+//   2.  forgat password email verification
+//   3. change phone number verification

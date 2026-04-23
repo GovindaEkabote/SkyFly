@@ -13,7 +13,7 @@ module.exports = {
   licenseType: constants.licenseType,
   pilotStatus: constants.pilotStatus,
   purpose: constants.purpose,
+  documents: constants.documents,
   transporter: transporter,
-  generateOtp:generateOtp
-
+  generateOtp: generateOtp,
 };

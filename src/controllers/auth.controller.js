@@ -388,5 +388,3 @@ module.exports = {
   resetPassword,
 };
 
-// forgot password
-// reset Password

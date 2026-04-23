@@ -7,6 +7,7 @@ module.exports = {
     super_admin: "SUPER_ADMIN",
     staff: "STAFF",
     pilot: "PILOT",
+    AirHostess: "AIRHOSTESS",
   },
 
   // Loyalty tiers
@@ -78,5 +79,14 @@ module.exports = {
     UNAUTHORIZED: "UNAUTHORIZED",
     USER_ALREADY_EXISTS: "USER_ALREADY_EXISTS",
     USER_NOT_FOUND: "USER_NOT_FOUND",
+  },
+  documents: {
+    password: "PASSWORD",
+    IdCard: "ID_CARD",
+    license: "LICENSE",
+    certificate: "CERTIFICATE",
+    education: "EDUCATION",
+    exprienceLetter: "EXPRIENCE_LETTER",
+    other: "OTHER",
   },
 };

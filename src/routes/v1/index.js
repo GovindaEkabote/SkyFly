@@ -20,11 +20,3 @@ router.put("/reset/password",token ,authController.resetPassword);
 
 module.exports = router;
 
-// POST /auth/register
-// POST /auth/login
-// POST /auth/logout
-// POST /auth/refresh-token
-// POST /auth/verify-otp
-// POST /auth/resend-otp
-// POST /auth/forgot-password
-// POST /auth/reset-password

@@ -76,6 +76,16 @@ const deleteUserById = async (userId) => {
   return user;
 };
 
+const uodateUserById = async (userId, data) => {
+  return await userRepository.updateUserById(userId, data);
+};
+
+const updateProfilePicture = async (userId, profilePictureData) => {
+  return await userRepository.updateUserById(userId, {
+    profilePicture: profilePictureData,
+  });
+};
+
 module.exports = {
   updateEmployeeDetails,
   updatePilotDetails,
@@ -86,4 +96,6 @@ module.exports = {
   deleteUserById,
   updateUserStatus,
   updatecustomerProfile,
+  uodateUserById, 
+  updateProfilePicture,
 };

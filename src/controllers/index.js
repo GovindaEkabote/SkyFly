@@ -8,6 +8,7 @@ const {
   deleteUser,
   updateStatus,
   updateCustomerProfile,
+  uploadUserProfilePicture ,
 } = require("./user.controller");
 
 module.exports = {
@@ -21,4 +22,5 @@ module.exports = {
   deleteUser,
   updateStatus,
   updateCustomerProfile,
+  uploadUserProfilePicture ,
 };
