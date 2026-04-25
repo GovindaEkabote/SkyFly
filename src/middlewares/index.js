@@ -15,6 +15,7 @@ const {
   uploadAirportLogo,
   uploadAircraftImage,
   uploadUserDocuments,
+  singleUploadDocument,
 } = require("./upload.middleware");
 const {
   validateUserRequestBody,
@@ -38,4 +39,5 @@ module.exports = {
   uploadAirlineBanner: uploadAirlineBanner,
   uploadAirportLogo: uploadAirportLogo,
   uploadAircraftImage: uploadAircraftImage,
+  singleUploadDocument: singleUploadDocument,
 };

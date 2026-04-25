@@ -211,6 +211,7 @@ const uploadUserProfilePicture = async (req, res) => {
   }
 };
 
+// upload Multiple Documents
 const uploadMultipleDocuments = async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
@@ -219,10 +220,6 @@ const uploadMultipleDocuments = async (req, res) => {
         message: "No files uploaded",
       });
     }
-
-    console.log("Complete file object:", JSON.stringify(req.files[0], null, 2));
-    console.log("All available keys:", Object.keys(req.files[0]));
-
     const { documentType } = req.body;
 
     let types = [];
@@ -262,7 +259,7 @@ const uploadMultipleDocuments = async (req, res) => {
       // multer-storage-cloudinary adds these properties to the file object:
       const documentUrl = file.path || file.secure_url || file.url;
       const documentPublicId = file.filename || file.public_id;
-      
+
       // Alternative: If the above doesn't work, try:
       // const documentUrl = file.path; // This should work
       // const documentPublicId = file.filename; // This should work
@@ -275,7 +272,7 @@ const uploadMultipleDocuments = async (req, res) => {
         public_id: file.public_id,
         url: file.url,
         originalname: file.originalname,
-        mimetype: file.mimetype
+        mimetype: file.mimetype,
       });
 
       if (!documentUrl) {
@@ -294,10 +291,11 @@ const uploadMultipleDocuments = async (req, res) => {
       try {
         const updatedUser = await userService.addUserDocument(
           req.user.id,
-          documentData
+          documentData,
         );
 
-        const savedDocument = updatedUser.documents?.[updatedUser.documents.length - 1];
+        const savedDocument =
+          updatedUser.documents?.[updatedUser.documents.length - 1];
 
         uploadedDocuments.push(savedDocument);
       } catch (err) {
@@ -305,7 +303,9 @@ const uploadMultipleDocuments = async (req, res) => {
 
         // Rollback cloudinary file if upload fails
         if (documentPublicId) {
-          await cloudinary.uploader.destroy(documentPublicId).catch(console.error);
+          await cloudinary.uploader
+            .destroy(documentPublicId)
+            .catch(console.error);
         }
       }
     }
@@ -329,6 +329,104 @@ const uploadMultipleDocuments = async (req, res) => {
   }
 };
 
+// upload Single Document..
+const uploadDocument = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "No File Uploaded",
+      });
+    }
+
+    const file = req.file;
+    const { documentType } = req.body;
+
+    // Validate document type
+    const validDocumentTypes = Object.values(DOCUMENT_TYPES);
+
+    if (!validDocumentTypes.includes(documentType)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "Invalid document type",
+      });
+    }
+
+    // Cloudinary fields (multer-storage-cloudinary)
+    const documentUrl = file.path;
+    const documentPublicId = file.filename;
+
+    console.log("File Debug:", {
+      path: file.path,
+      filename: file.filename,
+      originalname: file.originalname,
+      mimetype: file.mimetype,
+    });
+
+    if (!documentUrl) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Cloudinary URL not generated",
+      });
+    }
+
+    const documentData = {
+      type: documentType,
+      url: documentUrl,
+      publicId: documentPublicId,
+      uploadedAt: new Date(),
+      verified: false,
+    };
+
+    let newDocument;
+
+    try {
+      const updatedUser = await userService.addUserDocument(
+        req.user.id,
+        documentData,
+      );
+
+      newDocument = updatedUser.documents[updatedUser.documents.length - 1];
+    } catch (err) {
+      // Rollback upload if DB fails
+      if (documentPublicId) {
+        await cloudinary.uploader
+          .destroy(documentPublicId)
+          .catch(console.error);
+      }
+
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Database update failed",
+        error: err.message,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Document uploaded successfully",
+      data: {
+        document: newDocument,
+      },
+    });
+  } catch (error) {
+    console.error("Upload error:", error);
+
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Failed to upload document",
+      error: error.message,
+    });
+  }
+};
+
+const getUserDocuments = async (req, res) =>{
+  try {
+    
+  } catch (error) {
+    
+  }
+}
 module.exports = {
   updateEmployeeDetails,
   updatePilotDetails,
@@ -341,8 +439,5 @@ module.exports = {
   updateCustomerProfile,
   uploadUserProfilePicture,
   uploadMultipleDocuments,
+  uploadDocument,
 };
-
-// Auth -> 1. email and phone verification..
-//   2.  forgat password email verification
-//   3. change phone number verification

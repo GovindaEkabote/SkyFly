@@ -7,7 +7,7 @@ const {
   airlineBannerStorage,
   airportLogoStorage,
   aircraftImageStorage,
-  userDocumentsStorage
+  userDocumentsStorage,
 } = require("./upload");
 
 const imageFileFilter = (req, file, cb) => {
@@ -38,6 +38,13 @@ const uploadUserProfile = multer({
   fileFilter: imageFileFilter,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
 }).single("profilePicture");
+
+// upload single document..
+const singleUploadDocument = multer({
+  storage: userDocumentsStorage,
+  fileFilter: documentFileFilter,
+  limits: { fileSize: 10 * 1024 * 1000 },
+}).single("documents");
 
 // Upload middleware for user documents (multiple files)
 const uploadUserDocuments = multer({
@@ -81,4 +88,5 @@ module.exports = {
   uploadAirlineBanner,
   uploadAirportLogo,
   uploadAircraftImage,
+  singleUploadDocument,
 };

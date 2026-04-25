@@ -11,7 +11,8 @@ const {
   updateStatus,
   updateCustomerProfile,
   uploadUserProfilePicture,
-  uploadMultipleDocuments
+  uploadMultipleDocuments,
+  uploadDocument,
 } = require("../../controllers");
 const { constant } = require("../../utils");
 const {
@@ -20,7 +21,8 @@ const {
   token,
   roleBasedAuth,
   uploadUserProfile,
-  uploadUserDocuments
+  uploadUserDocuments,
+  singleUploadDocument,
 } = require("../../middlewares");
 
 router.patch(
@@ -99,12 +101,20 @@ router.post(
   uploadUserProfilePicture,
 );
 
-
 router.post(
   "/user/document",
   token,
   uploadUserDocuments,
   uploadMultipleDocuments,
 );
+
+router.post(
+  "/user/single/document",
+  token,
+  singleUploadDocument,
+  uploadDocument,
+);
+
+
 
 module.exports = router;
