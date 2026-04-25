@@ -92,7 +92,21 @@ const addUserDocument = async (userId, documents) => {
   }
 
   return await userRepository.addDocuments(userId, documents);
-};  
+};
+
+const getUserDocuments = async (userId) => {
+  const user = await userRepository.getAllDocuments(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  if (!user.documents || user.documents.length === 0) {
+    throw new Error("No documents found");
+  }
+
+  return user.documents;
+};
 
 module.exports = {
   updateEmployeeDetails,
@@ -104,7 +118,8 @@ module.exports = {
   deleteUserById,
   updateUserStatus,
   updatecustomerProfile,
-  uodateUserById, 
+  uodateUserById,
   updateProfilePicture,
-  addUserDocument 
+  addUserDocument,
+  getUserDocuments,
 };

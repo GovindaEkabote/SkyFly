@@ -31,7 +31,7 @@ const addDocuments = async (userId, documents) => {
   documents.forEach((doc) => {
     user.documents.push({
       type: doc.type,
-      url: doc.url,              // 🔥 FIX: MUST STORE URL
+      url: doc.url, // 🔥 FIX: MUST STORE URL
       publicId: doc.publicId,
       uploadedAt: doc.uploadedAt || new Date(),
       verified: doc.verified || false,
@@ -43,10 +43,15 @@ const addDocuments = async (userId, documents) => {
   return user;
 };
 
+const getAllDocuments =  async (userId) => {
+  return await User.findById(userId).select("documents");
+};
+
 module.exports = {
   updateUserById,
   getUserById,
   getUsers,
   deleteUserById,
-  addDocuments
+  addDocuments,
+  getAllDocuments,
 };

@@ -13,6 +13,7 @@ const {
   uploadUserProfilePicture,
   uploadMultipleDocuments,
   uploadDocument,
+  getUserDocument,
 } = require("../../controllers");
 const { constant } = require("../../utils");
 const {
@@ -115,6 +116,11 @@ router.post(
   uploadDocument,
 );
 
+router.get(
+  "/user/get/document",
+  token,
+  getUserDocument,
+);
 
-
+// getUserDocument
 module.exports = router;

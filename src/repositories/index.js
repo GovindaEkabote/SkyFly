@@ -4,6 +4,7 @@ const {
   getUsers,
   deleteUserById,
   addDocuments,
+  getAllDocuments,
 } = require("./user.repository");
 
 module.exports = {
@@ -12,4 +13,5 @@ module.exports = {
   getUsers,
   deleteUserById,
   addDocuments,
+  getAllDocuments,
 };

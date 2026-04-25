@@ -420,13 +420,28 @@ const uploadDocument = async (req, res) => {
   }
 };
 
-const getUserDocuments = async (req, res) =>{
+const getUserDocument = async (req, res) => {
   try {
-    
+    const userId = req.user.id;
+
+    const documents = await userService.getUserDocuments(userId);
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      data: {
+        documents,
+        total: documents.length,
+      },
+    });
   } catch (error) {
-    
+    res.status(StatusCodes.BAD_REQUEST).json({
+      success: false,
+      message: error.message,
+    });
   }
-}
+};
+
+
 module.exports = {
   updateEmployeeDetails,
   updatePilotDetails,
@@ -440,4 +455,5 @@ module.exports = {
   uploadUserProfilePicture,
   uploadMultipleDocuments,
   uploadDocument,
+  getUserDocument,
 };
