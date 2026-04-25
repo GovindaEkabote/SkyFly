@@ -11,6 +11,7 @@ const {
   updateStatus,
   updateCustomerProfile,
   uploadUserProfilePicture,
+  uploadMultipleDocuments
 } = require("../../controllers");
 const { constant } = require("../../utils");
 const {
@@ -19,6 +20,7 @@ const {
   token,
   roleBasedAuth,
   uploadUserProfile,
+  uploadUserDocuments
 } = require("../../middlewares");
 
 router.patch(
@@ -95,6 +97,14 @@ router.post(
   token,
   uploadUserProfile,
   uploadUserProfilePicture,
+);
+
+
+router.post(
+  "/user/document",
+  token,
+  uploadUserDocuments,
+  uploadMultipleDocuments,
 );
 
 module.exports = router;

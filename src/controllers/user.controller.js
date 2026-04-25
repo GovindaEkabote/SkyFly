@@ -1,7 +1,7 @@
-const { constant, userStatuses } = require("../utils");
+const { constant, userStatuses, DOCUMENT_TYPES } = require("../utils");
 const userService = require("../services");
 const { StatusCodes } = require("http-status-codes");
-const { cloudinary_js_config } = require("../config");
+const { cloudinary_js_config, cloudinary } = require("../config");
 
 const updateEmployeeDetails = async (req, res) => {
   try {
@@ -172,14 +172,15 @@ const updateCustomerProfile = async (req, res) => {
   }
 };
 
-const uploadUserProfilePicture  = async (req, res) => {
+const uploadUserProfilePicture = async (req, res) => {
   try {
     if (!req.file) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ error: "No file uploaded" });
     }
-    const user = await userService.getUserById(req.user.id);userService.uodateUserById
+    const user = await userService.getUserById(req.user.id);
+    userService.uodateUserById;
 
     if (user.profilePicture && user.profilePicture.publichId) {
       await cloudinary_js_config.uploader.destroy(
@@ -210,6 +211,124 @@ const uploadUserProfilePicture  = async (req, res) => {
   }
 };
 
+const uploadMultipleDocuments = async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "No files uploaded",
+      });
+    }
+
+    console.log("Complete file object:", JSON.stringify(req.files[0], null, 2));
+    console.log("All available keys:", Object.keys(req.files[0]));
+
+    const { documentType } = req.body;
+
+    let types = [];
+
+    if (typeof documentType === "string") {
+      try {
+        types = JSON.parse(documentType);
+      } catch (err) {
+        types = [documentType];
+      }
+    } else if (Array.isArray(documentType)) {
+      types = documentType;
+    }
+
+    const validDocumentTypes = Object.values(DOCUMENT_TYPES);
+
+    if (types.length > 0 && types.length !== req.files.length) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: `Document types (${types.length}) must match files (${req.files.length})`,
+      });
+    }
+
+    const uploadedDocuments = [];
+    const errors = [];
+
+    for (let i = 0; i < req.files.length; i++) {
+      const file = req.files[i];
+      const type = types[i] || DOCUMENT_TYPES.OTHER;
+
+      if (!validDocumentTypes.includes(type)) {
+        errors.push(`Invalid type for file ${i + 1}: ${type}`);
+        continue;
+      }
+
+      // ✅ CORRECT WAY TO GET CLOUDINARY URL AND PUBLIC ID
+      // multer-storage-cloudinary adds these properties to the file object:
+      const documentUrl = file.path || file.secure_url || file.url;
+      const documentPublicId = file.filename || file.public_id;
+      
+      // Alternative: If the above doesn't work, try:
+      // const documentUrl = file.path; // This should work
+      // const documentPublicId = file.filename; // This should work
+
+      // Debug logging to see what's available
+      console.log("File object structure:", {
+        path: file.path,
+        filename: file.filename,
+        secure_url: file.secure_url,
+        public_id: file.public_id,
+        url: file.url,
+        originalname: file.originalname,
+        mimetype: file.mimetype
+      });
+
+      if (!documentUrl) {
+        errors.push(`Cloudinary URL not available for file ${i + 1}`);
+        continue;
+      }
+
+      const documentData = {
+        type,
+        url: documentUrl,
+        publicId: documentPublicId,
+        uploadedAt: new Date(),
+        verified: false,
+      };
+
+      try {
+        const updatedUser = await userService.addUserDocument(
+          req.user.id,
+          documentData
+        );
+
+        const savedDocument = updatedUser.documents?.[updatedUser.documents.length - 1];
+
+        uploadedDocuments.push(savedDocument);
+      } catch (err) {
+        errors.push(`Upload failed for file ${i + 1}: ${err.message}`);
+
+        // Rollback cloudinary file if upload fails
+        if (documentPublicId) {
+          await cloudinary.uploader.destroy(documentPublicId).catch(console.error);
+        }
+      }
+    }
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: `${uploadedDocuments.length} documents uploaded`,
+      data: {
+        documents: uploadedDocuments,
+        errors: errors.length ? errors : undefined,
+      },
+    });
+  } catch (error) {
+    console.error("Multiple upload error:", error);
+
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Failed to upload documents",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   updateEmployeeDetails,
   updatePilotDetails,
@@ -220,7 +339,8 @@ module.exports = {
   deleteUser,
   updateStatus,
   updateCustomerProfile,
-  uploadUserProfilePicture ,
+  uploadUserProfilePicture,
+  uploadMultipleDocuments,
 };
 
 // Auth -> 1. email and phone verification..

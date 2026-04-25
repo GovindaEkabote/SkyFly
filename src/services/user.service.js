@@ -86,6 +86,14 @@ const updateProfilePicture = async (userId, profilePictureData) => {
   });
 };
 
+const addUserDocument = async (userId, documents) => {
+  if (!Array.isArray(documents)) {
+    documents = [documents];
+  }
+
+  return await userRepository.addDocuments(userId, documents);
+};  
+
 module.exports = {
   updateEmployeeDetails,
   updatePilotDetails,
@@ -98,4 +106,5 @@ module.exports = {
   updatecustomerProfile,
   uodateUserById, 
   updateProfilePicture,
+  addUserDocument 
 };

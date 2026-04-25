@@ -1,5 +1,11 @@
 const mongoose = require("mongoose");
-const { constant, userStatuses, loyaltyTiers, documents } = require("../utils");
+const {
+  constant,
+  userStatuses,
+  loyaltyTiers,
+  documents,
+  DOCUMENT_TYPES,
+} = require("../utils");
 const employeeDetailsSchema = require("./Schemas/employeeDetails.schema");
 const pilotDetailsSchema = require("./Schemas/pilotDetails.schema");
 const personalDetailsSchema = require("./Schemas/personalDetails.schema");
@@ -56,13 +62,13 @@ const userSchema = new mongoose.Schema(
         type: {
           type: String,
           enum: [
-            documents.password,
-            documents.IdCard,
-            documents.license,
-            documents.certificate,
-            documents.education,
-            documents.exprienceLetter,
-            documents.other,
+            DOCUMENT_TYPES.password,
+            DOCUMENT_TYPES.IdCard,
+            DOCUMENT_TYPES.license,
+            DOCUMENT_TYPES.certificate,
+            DOCUMENT_TYPES.education,
+            DOCUMENT_TYPES.exprienceLetter,
+            DOCUMENT_TYPES.other,
           ],
           required: true,
         },

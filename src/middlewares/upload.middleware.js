@@ -1,11 +1,13 @@
+// middlewares/upload.middleware.js
 const multer = require("multer");
-const { userDocumentsStorage } = require(".");
+// const { userDocumentsStorage } = require("./upload");
 const {
   userProfileStorage,
   airlineLogoStorage,
   airlineBannerStorage,
   airportLogoStorage,
   aircraftImageStorage,
+  userDocumentsStorage
 } = require("./upload");
 
 const imageFileFilter = (req, file, cb) => {

@@ -16,4 +16,5 @@ module.exports = {
   documents: constants.documents,
   transporter: transporter,
   generateOtp: generateOtp,
+  DOCUMENT_TYPES  : constants.DOCUMENT_TYPES 
 };

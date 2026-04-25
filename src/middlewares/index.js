@@ -1,11 +1,12 @@
+// middlewares/index.js
 const { verifyToken, authorizeRoles } = require("./authJwt");
 const {
   userProfileStorage,
-  userDocumentsStorage,
   airlineLogoStorage,
   airlineBannerStorage,
   airportLogoStorage,
   aircraftImageStorage,
+  userDocumentsStorage,
 } = require("./upload");
 const {
   uploadUserProfile,

@@ -1,6 +1,6 @@
-// config/storage.config.js
+// middlewares/upload.js
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const { cloudinary } = require("../config"); // Fix import path
+const { cloudinary } = require("../config/cloudinary.config"); // Fix import path
 
 // Check if cloudinary is properly imported
 if (!cloudinary || !cloudinary.uploader) {
@@ -20,11 +20,14 @@ const userProfileStorage = new CloudinaryStorage({
 
 const userDocumentsStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: "skyfly/users/documents", // Fixed typo: floder -> folder
-    allowed_formats: ["jpg", "jpeg", "png", "pdf"],
-    resource_type: "auto",
-    public_id: (req, file) => `user_${req.user?.id || 'anonymous'}_${Date.now()}`,
+  params: async (req, file) => {
+    return {
+      folder: "skyfly/users/documents",
+      allowed_formats: ["jpg", "jpeg", "png", "pdf", "doc", "docx"],
+      resource_type: "auto",
+      public_id: `user_${req.user?.id || "anonymous"}_${Date.now()}`,
+      transformation: [{ quality: "auto" }]
+    };
   },
 });
 
@@ -34,6 +37,7 @@ const airlineLogoStorage = new CloudinaryStorage({
     folder: "skyfly/airlines/logos", // Fixed typo: floder -> folder and airlins -> airlines
     allowed_formats: ["jpg", "jpeg", "png", "webp"],
     public_id: (req, file) => `airline_${req.params?.airlineId}_logo`,
+    transformation: [{ quality: "auto" }]
   },
 });
 

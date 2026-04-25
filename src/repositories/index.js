@@ -1,8 +1,15 @@
-const { updateUserById, getUserById, getUsers,deleteUserById } = require("./user.repository");
+const {
+  updateUserById,
+  getUserById,
+  getUsers,
+  deleteUserById,
+  addDocuments,
+} = require("./user.repository");
 
 module.exports = {
   updateUserById,
   getUserById,
   getUsers,
-  deleteUserById
+  deleteUserById,
+  addDocuments,
 };

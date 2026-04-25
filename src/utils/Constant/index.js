@@ -80,7 +80,7 @@ module.exports = {
     USER_ALREADY_EXISTS: "USER_ALREADY_EXISTS",
     USER_NOT_FOUND: "USER_NOT_FOUND",
   },
-  documents: {
+  DOCUMENT_TYPES : {
     password: "PASSWORD",
     IdCard: "ID_CARD",
     license: "LICENSE",
