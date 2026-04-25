@@ -13,7 +13,8 @@ const {
   uodateUserById,
   updateProfilePicture,
   addUserDocument ,
-  getUserDocuments
+  getUserDocuments,
+  deleteUserDocument
 } = require("./user.service");
 
 module.exports = {
@@ -32,4 +33,5 @@ module.exports = {
   updateProfilePicture: updateProfilePicture,
   addUserDocument: addUserDocument,
   getUserDocuments: getUserDocuments,
+  deleteUserDocument : deleteUserDocument
 };

@@ -14,6 +14,7 @@ const {
   uploadMultipleDocuments,
   uploadDocument,
   getUserDocument,
+  deleteDocument,
 } = require("../../controllers");
 const { constant } = require("../../utils");
 const {
@@ -120,6 +121,12 @@ router.get(
   "/user/get/document",
   token,
   getUserDocument,
+);
+
+router.delete(
+  "/delete/document/:documentId",
+  token,
+  deleteDocument,
 );
 
 // getUserDocument

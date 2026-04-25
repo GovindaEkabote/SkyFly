@@ -5,6 +5,8 @@ const {
   deleteUserById,
   addDocuments,
   getAllDocuments,
+  saveUser,
+  getUserByIdWithDocuments
 } = require("./user.repository");
 
 module.exports = {
@@ -14,4 +16,6 @@ module.exports = {
   deleteUserById,
   addDocuments,
   getAllDocuments,
+  saveUser,
+  getUserByIdWithDocuments
 };

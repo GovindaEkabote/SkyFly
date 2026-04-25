@@ -1,5 +1,7 @@
+const { StatusCodes } = require("http-status-codes");
 const userRepository = require("../repositories");
 const { constant } = require("../utils");
+const { cloudinary } = require("../config");
 
 const updateEmployeeDetails = async (userId, employeeDetails) => {
   const updatePayload = {
@@ -53,7 +55,10 @@ const updatecustomerProfile = async (userId, data) => {
 const getUserById = async (userId) => {
   const user = await userRepository.getUserById(userId);
   if (!user) {
-    throw new Error("User not found");
+    return res.status(StatusCodes.NOT_FOUND).json({
+      success: false,
+      message: "user Not Found",
+    });
   }
   return user;
 };
@@ -62,7 +67,10 @@ const getUsers = async () => {
   const users = await userRepository.getUsers();
 
   if (!users || users.length === 0) {
-    throw new Error("No users found");
+    return res.status(StatusCodes.NOT_FOUND).json({
+      success: false,
+      message: "user Not Found",
+    });
   }
   return users;
 };
@@ -98,14 +106,49 @@ const getUserDocuments = async (userId) => {
   const user = await userRepository.getAllDocuments(userId);
 
   if (!user) {
-    throw new Error("User not found");
+    return res.status(StatusCodes.NOT_FOUND).json({
+      success: false,
+      message: "user Not Found",
+    });
   }
 
   if (!user.documents || user.documents.length === 0) {
-    throw new Error("No documents found");
+    return res.status(StatusCodes.NOT_FOUND).json({
+      success: false,
+      message: "Document Not Found",
+    });
   }
 
   return user.documents;
+};
+
+const deleteUserDocument = async (userId, documentId) => {
+  const user = await userRepository.getUserByIdWithDocuments(userId);
+
+  console.log("User ID:", userId);
+console.log("Document ID:", documentId);
+console.log("User Documents:", user.documents);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const document = user.documents.id(documentId);
+
+  if (!document) {
+    throw new Error("Document not found");
+  }
+
+  // 🔥 Delete from Cloudinary FIRST
+  if (document.publicId) {
+    await cloudinary.uploader.destroy(document.publicId);
+  }
+
+  // Remove from DB
+  user.documents.pull(documentId);
+
+  await userRepository.saveUser(user);
+
+  return true;
 };
 
 module.exports = {
@@ -122,4 +165,5 @@ module.exports = {
   updateProfilePicture,
   addUserDocument,
   getUserDocuments,
+  deleteUserDocument,
 };

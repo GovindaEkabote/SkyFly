@@ -441,6 +441,22 @@ const getUserDocument = async (req, res) => {
   }
 };
 
+// deleteDocuments
+const deleteDocument = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { documentId } = req.params;
+
+    await userService.deleteUserDocument(userId, documentId);
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Document deleted successfully",
+    });
+  } catch (error) {
+    res.status(StatusCodes.NOT_FOUND).json({ message: error.message });
+  }
+};
 
 module.exports = {
   updateEmployeeDetails,
@@ -456,4 +472,5 @@ module.exports = {
   uploadMultipleDocuments,
   uploadDocument,
   getUserDocument,
+  deleteDocument,
 };

@@ -43,9 +43,21 @@ const addDocuments = async (userId, documents) => {
   return user;
 };
 
-const getAllDocuments =  async (userId) => {
+const getAllDocuments = async (userId) => {
   return await User.findById(userId).select("documents");
 };
+
+const getUserByIdWithDocuments = async (userId) => {
+  return await User.findById(userId).select("documents");
+};
+
+const saveUser = async (user) => {
+  return await user.save();
+};
+
+// const getUserByIdWithDocuments = async (userId) => {
+//   return await User.findById(userId).select("documents");
+// };
 
 module.exports = {
   updateUserById,
@@ -54,4 +66,6 @@ module.exports = {
   deleteUserById,
   addDocuments,
   getAllDocuments,
+  saveUser,
+  getUserByIdWithDocuments
 };
