@@ -15,6 +15,7 @@ const {
   uploadDocument,
   getUserDocument,
   deleteDocument,
+  verifyDocument,
 } = require("../../controllers");
 const { constant } = require("../../utils");
 const {
@@ -117,16 +118,15 @@ router.post(
   uploadDocument,
 );
 
-router.get(
-  "/user/get/document",
-  token,
-  getUserDocument,
-);
+router.get("/user/get/document", token, getUserDocument);
 
-router.delete(
-  "/delete/document/:documentId",
+router.delete("/delete/document/:documentId", token, deleteDocument);
+
+router.put(
+  "/verify/document/:documentId",
   token,
-  deleteDocument,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  verifyDocument,
 );
 
 // getUserDocument

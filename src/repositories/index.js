@@ -6,7 +6,8 @@ const {
   addDocuments,
   getAllDocuments,
   saveUser,
-  getUserByIdWithDocuments
+  getUserByIdWithDocuments,
+  verifyUserDocument
 } = require("./user.repository");
 
 module.exports = {
@@ -17,5 +18,6 @@ module.exports = {
   addDocuments,
   getAllDocuments,
   saveUser,
-  getUserByIdWithDocuments
+  getUserByIdWithDocuments,
+  verifyUserDocument
 };

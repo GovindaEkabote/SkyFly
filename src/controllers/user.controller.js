@@ -458,6 +458,50 @@ const deleteDocument = async (req, res) => {
   }
 };
 
+const verifyDocument = async (req, res) => {
+  try {
+    // const userId = req.user.id;
+    const { documentId } = req.params;
+    const { verified } = req.body;
+
+    // Validate verified field
+    if (typeof verified !== "boolean") {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "verified must be true or false",
+      });
+    }
+
+    // Validate documentId
+    if (!documentId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: "Document ID is required",
+      });
+    }
+
+    const user = await userService.verifyDocument(
+      // userId,
+      documentId,
+      verified
+    );
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: `Document ${verified ? "verified" : "rejected"} successfully`,
+      data: user,
+    });
+
+  } catch (error) {
+    console.error("Verify Document Error:", error);
+
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: error.message || "Something went wrong",
+    });
+  }
+};
+
 module.exports = {
   updateEmployeeDetails,
   updatePilotDetails,
@@ -473,4 +517,5 @@ module.exports = {
   uploadDocument,
   getUserDocument,
   deleteDocument,
+  verifyDocument
 };

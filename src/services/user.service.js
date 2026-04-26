@@ -124,10 +124,6 @@ const getUserDocuments = async (userId) => {
 
 const deleteUserDocument = async (userId, documentId) => {
   const user = await userRepository.getUserByIdWithDocuments(userId);
-
-  console.log("User ID:", userId);
-console.log("Document ID:", documentId);
-console.log("User Documents:", user.documents);
   if (!user) {
     throw new Error("User not found");
   }
@@ -151,6 +147,14 @@ console.log("User Documents:", user.documents);
   return true;
 };
 
+const verifyDocument = async ( documentId, verified) => {
+  return await userRepository.verifyUserDocument(
+    // userId,
+    documentId,
+    verified 
+  );
+};
+
 module.exports = {
   updateEmployeeDetails,
   updatePilotDetails,
@@ -166,4 +170,5 @@ module.exports = {
   addUserDocument,
   getUserDocuments,
   deleteUserDocument,
+  verifyDocument
 };

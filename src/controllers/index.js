@@ -13,6 +13,7 @@ const {
   uploadDocument,
   getUserDocument,
   deleteDocument,
+  verifyDocument
 } = require("./user.controller");
 
 module.exports = {
@@ -31,4 +32,5 @@ module.exports = {
   uploadDocument,
   getUserDocument,
   deleteDocument,
+  verifyDocument
 };

@@ -55,9 +55,17 @@ const saveUser = async (user) => {
   return await user.save();
 };
 
-// const getUserByIdWithDocuments = async (userId) => {
-//   return await User.findById(userId).select("documents");
-// };
+const verifyUserDocument = async ( documentId, verified) => {
+  return await User.findOneAndUpdate(
+    { "documents._id": documentId },
+    {
+      $set: {
+        "documents.$.verified": verified, // ✅ now defined
+      },
+    },
+    { new: true }
+  );
+};
 
 module.exports = {
   updateUserById,
@@ -67,5 +75,6 @@ module.exports = {
   addDocuments,
   getAllDocuments,
   saveUser,
-  getUserByIdWithDocuments
+  getUserByIdWithDocuments,
+  verifyUserDocument
 };
