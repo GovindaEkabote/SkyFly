@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { authController } = require("../../controllers");
 const { validationUser, validateUserStatus, token } = require("../../middlewares");
+const { limiter } = require("../../config");
 
 router.post(
   "/signup",
@@ -10,7 +11,7 @@ router.post(
   authController.signUp,
 );
 
-router.get("/login", authController.login);
+router.get("/login", limiter,authController.login);
 router.get("/logout", authController.logout);
 router.post("/auth/send-register-otp", authController.sendRegisterOtp);
 router.post("/users/change-email/send-otp",token ,authController.sendChangeEmailOtp);

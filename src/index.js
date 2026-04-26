@@ -1,6 +1,6 @@
 const express = require("express");
 var cookieParser = require('cookie-parser')
-const { serverConfig, connectDB } = require("./config");
+const { serverConfig, connectDB, limiter } = require("./config");
 const apiRoutes = require("./routes/index.js");
 const logger = require("./config/logger-config.js");
 const app = express();
@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(cookieParser())
 app.use("/api", apiRoutes);
 
-
+app.use(limiter)
 
 // ✅ Start server ONLY after DB connection
 const startServer = async () => {
