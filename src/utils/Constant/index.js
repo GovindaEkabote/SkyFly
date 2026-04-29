@@ -80,7 +80,7 @@ module.exports = {
     USER_ALREADY_EXISTS: "USER_ALREADY_EXISTS",
     USER_NOT_FOUND: "USER_NOT_FOUND",
   },
-  DOCUMENT_TYPES : {
+  DOCUMENT_TYPES: {
     password: "PASSWORD",
     IdCard: "ID_CARD",
     license: "LICENSE",
@@ -88,5 +88,10 @@ module.exports = {
     education: "EDUCATION",
     exprienceLetter: "EXPRIENCE_LETTER",
     other: "OTHER",
+  },
+  airlineStatus: {
+    activeAirline: "ACTIVE",
+    inactiveAirline: "INACTIVE",
+    suspendedAirline: "SUSPENDED",
   },
 };
