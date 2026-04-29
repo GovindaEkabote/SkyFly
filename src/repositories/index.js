@@ -1,3 +1,4 @@
+const AllianceRepository = require("./alliance.repository");
 const {
   updateUserById,
   getUserById,
@@ -19,5 +20,6 @@ module.exports = {
   getAllDocuments,
   saveUser,
   getUserByIdWithDocuments,
-  verifyUserDocument
+  verifyUserDocument,
+  AllianceRepository
 };

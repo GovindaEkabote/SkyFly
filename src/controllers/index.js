@@ -1,3 +1,4 @@
+const AllianceController = require("./alliance.controller");
 const {
   updateEmployeeDetails,
   updatePilotDetails,
@@ -13,7 +14,7 @@ const {
   uploadDocument,
   getUserDocument,
   deleteDocument,
-  verifyDocument
+  verifyDocument,
 } = require("./user.controller");
 
 module.exports = {
@@ -32,5 +33,6 @@ module.exports = {
   uploadDocument,
   getUserDocument,
   deleteDocument,
-  verifyDocument
+  verifyDocument,
+  AllianceController,
 };

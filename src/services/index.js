@@ -1,3 +1,4 @@
+const allianceService = require("./alliance.service");
 const { sendOtpEmail } = require("./email.service");
 const {
   updateEmployeeDetails,
@@ -36,4 +37,5 @@ module.exports = {
   getUserDocuments: getUserDocuments,
   deleteUserDocument: deleteUserDocument,
   verifyDocument: verifyDocument,
+  allianceService
 };
