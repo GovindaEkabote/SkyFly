@@ -4,8 +4,10 @@ const { serverConfig, connectDB, limiter } = require("./config");
 const apiRoutes = require("./routes/index.js");
 const logger = require("./config/logger-config.js");
 const app = express();
+const cors = require('cors')
 
 
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser())
 app.use("/api", apiRoutes);

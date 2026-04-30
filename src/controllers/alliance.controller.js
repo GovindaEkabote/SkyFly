@@ -17,6 +17,25 @@ class AllianceController {
       });
     }
   }
+
+  async getAlliances(req, res, next) {
+    try {
+      const { page = 1, limit = 10 } = req.query;
+
+      const alliances = await AllianceService.getAllAlliances(page, limit);
+
+      return res.status(StatusCodes.OK).json({
+        success: true,
+        data: alliances,
+      });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Error in getAllAlliance services",
+        error,
+      });
+    }
+  }
 }
 
 module.exports = new AllianceController();
