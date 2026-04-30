@@ -36,6 +36,30 @@ class AllianceController {
       });
     }
   }
+
+  async getAlliance(req, res, next) {
+    try {
+      const { id } = req.params;
+      const user = await AllianceService.getAllAllianceById(id);
+      if (!user) {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          success: false,
+          message: "Alliance Not Found",
+        });
+      }
+      return res.status(StatusCodes.OK).json({
+        success: true,
+        message: "Alliance fetched successfully",
+        data: user,
+      });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Error in getAllAlliance services",
+        error,
+      });
+    }
+  }
 }
 
 module.exports = new AllianceController();

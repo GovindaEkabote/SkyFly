@@ -47,6 +47,19 @@ class AllianceService {
       });
     }
   }
+
+  async getAllAllianceById(id) {
+    try {
+      const getId = await AllianceRepository.getAllAllianceById(id);
+      return getId;
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Error in getAllianceById",
+        error,
+      });
+    }
+  }
 }
 
 module.exports = new AllianceService();

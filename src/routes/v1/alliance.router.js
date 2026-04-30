@@ -17,6 +17,15 @@ router.get(
   roleBasedAuth(constant.airline_admin, constant.super_admin),
   AllianceController.getAlliances,
 );
+
+router.get(
+  "/get/alliance/:id",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  AllianceController.getAlliance,
+);
+
+
 module.exports = router;
 
 // cloudinary implement to upload logo

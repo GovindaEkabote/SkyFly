@@ -17,6 +17,10 @@ class AllianceRepository {
   countUsers(){
     return User.countDocuments()
   }
+
+  getAllAllianceById(id){
+    return Alliance.findById(id);
+  }
 }
 
 module.exports = new AllianceRepository();
