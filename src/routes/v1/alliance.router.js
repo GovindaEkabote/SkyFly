@@ -25,6 +25,12 @@ router.get(
   AllianceController.getAlliance,
 );
 
+router.put(
+  "/update/alliance/:allianceId",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  AllianceController.updateAlliance,
+);
 
 module.exports = router;
 

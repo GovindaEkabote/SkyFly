@@ -60,6 +60,21 @@ class AllianceService {
       });
     }
   }
+
+  async updateAllianceById(allianceId, data) {
+    try {
+      return await AllianceRepository.updateUserById(
+        allianceId,
+        data,
+      );
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Error in updateAllianceById service",
+        error,
+      });
+    }
+  }
 }
 
 module.exports = new AllianceService();

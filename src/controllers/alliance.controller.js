@@ -21,9 +21,7 @@ class AllianceController {
   async getAlliances(req, res, next) {
     try {
       const { page = 1, limit = 10 } = req.query;
-
       const alliances = await AllianceService.getAllAlliances(page, limit);
-
       return res.status(StatusCodes.OK).json({
         success: true,
         data: alliances,
@@ -36,7 +34,7 @@ class AllianceController {
       });
     }
   }
-
+  
   async getAlliance(req, res, next) {
     try {
       const { id } = req.params;
@@ -56,6 +54,42 @@ class AllianceController {
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Error in getAllAlliance services",
+        error,
+      });
+    }
+  }
+  async updateAlliance(req, res, next) {
+    try {
+      const { allianceId } = req.params;
+      const data = req.body;
+
+      if (!allianceId) {
+        return res.status(400).json({
+          success: false,
+          message: "Alliance ID is required",
+        });
+      }
+      const updatedAlliance = await AllianceService.updateAllianceById(
+        allianceId,
+        data,
+      );
+
+      if (!updatedAlliance) {
+        return res.status(404).json({
+          success: false,
+          message: "Alliance not found",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Alliance details updated successfully",
+        data: updatedAlliance,
+      });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Error in Update Alliance services",
         error,
       });
     }

@@ -15,11 +15,19 @@ class AllianceRepository {
   }
 
   countUsers(){
-    return User.countDocuments()
+    return Alliance.countDocuments()
   }
 
   getAllAllianceById(id){
     return Alliance.findById(id);
+  }
+
+  updateUserById(allianceId, data){
+    return Alliance.findByIdAndUpdate(
+      allianceId,
+      {$set: data},
+      {new :true, runValidators: true}
+    )
   }
 }
 
