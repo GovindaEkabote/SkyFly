@@ -63,14 +63,31 @@ class AllianceService {
 
   async updateAllianceById(allianceId, data) {
     try {
-      return await AllianceRepository.updateUserById(
-        allianceId,
-        data,
-      );
+      return await AllianceRepository.updateUserById(allianceId, data);
     } catch (error) {
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Error in updateAllianceById service",
+        error,
+      });
+    }
+  }
+
+  async deleteById(id) {
+    try {
+      const allianceId = AllianceRepository.deleteById(id);
+
+      if (!allianceId) {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          success: false,
+          message: "ID Not Found",
+        });
+      }
+      return allianceId;
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Error in deleteById service",
         error,
       });
     }

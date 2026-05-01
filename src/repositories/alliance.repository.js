@@ -14,20 +14,24 @@ class AllianceRepository {
     return Alliance.find().skip(skip).limit(limit);
   }
 
-  countUsers(){
-    return Alliance.countDocuments()
+  countUsers() {
+    return Alliance.countDocuments();
   }
 
-  getAllAllianceById(id){
+  getAllAllianceById(id) {
     return Alliance.findById(id);
   }
 
-  updateUserById(allianceId, data){
+  updateUserById(allianceId, data) {
     return Alliance.findByIdAndUpdate(
       allianceId,
-      {$set: data},
-      {new :true, runValidators: true}
-    )
+      { $set: data },
+      { new: true, runValidators: true },
+    );
+  }
+
+  deleteById(id) {
+    return Alliance.findByIdAndDelete(id);
   }
 }
 

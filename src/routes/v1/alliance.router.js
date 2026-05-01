@@ -32,6 +32,13 @@ router.put(
   AllianceController.updateAlliance,
 );
 
+router.delete(
+  "/delete/alliance/:id",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  AllianceController.deleteAlliance,
+);
+
 module.exports = router;
 
 // cloudinary implement to upload logo

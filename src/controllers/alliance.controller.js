@@ -29,12 +29,12 @@ class AllianceController {
     } catch (error) {
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: "Error in getAllAlliance services",
+        message: "Error in getAllAlliance Controller",
         error,
       });
     }
   }
-  
+
   async getAlliance(req, res, next) {
     try {
       const { id } = req.params;
@@ -53,11 +53,12 @@ class AllianceController {
     } catch (error) {
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: "Error in getAllAlliance services",
+        message: "Error in getAllAlliance Controller",
         error,
       });
     }
   }
+
   async updateAlliance(req, res, next) {
     try {
       const { allianceId } = req.params;
@@ -90,6 +91,21 @@ class AllianceController {
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Error in Update Alliance services",
+        error,
+      });
+    }
+  }
+
+  async deleteAlliance(req, res, next) {
+    try {
+      const alliance = await AllianceService.deleteById(req.params.id);
+      res.status(StatusCodes.OK).json({
+        message: "Alliance deleted successfully",
+      })
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Error in deleteAlliance Controller",
         error,
       });
     }
