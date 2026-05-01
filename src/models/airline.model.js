@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { airlineStatuc, airlineStatus } = require("../utils");
+const { airlineStatues } = require("../utils");
 
 const airlineSchema = new mongoose.Schema(
   {
@@ -14,7 +14,7 @@ const airlineSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      trim: name,
+      trim: true,
       index: true,
     },
     country: {
@@ -33,8 +33,6 @@ const airlineSchema = new mongoose.Schema(
     contactInfo: {
       phone: {
         type: String,
-        match:
-          /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,6}[-\s\.]?[0-9]{1,6}$/,
       },
       email: {
         type: String,
@@ -53,11 +51,11 @@ const airlineSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: [
-        airlineStatus.activeAirline,
-        airlineStatus.inactiveAirline,
-        airlineStatus.suspendedAirline,
+        airlineStatues.activeAirline,
+        airlineStatues.inactiveAirline,
+        airlineStatues.suspendedAirline,
       ],
-      default: airlineStatus.activeAirline,
+      default: airlineStatues.activeAirline,
       index: true,
     },
     hubs: [
@@ -89,5 +87,3 @@ airlineSchema.index({ code: 1, status: 1 });
 airlineSchema.index({ name: "text", country: "text" });
 
 module.exports = mongoose.model("Airline", airlineSchema);
-
-

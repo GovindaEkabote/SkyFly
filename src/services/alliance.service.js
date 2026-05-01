@@ -99,18 +99,14 @@ class AllianceService {
       if (!allianceId) {
         throw new Error("Alliance ID is required");
       }
-
       // 2️⃣ Validate status
       if (!status) {
         throw new Error("Status is required");
       }
-
       const update = await AllianceRepository.updateStatus(allianceId, status);
-
       if (!update) {
         throw new Error("Alliance not found");
       }
-
       return update;
     } catch (error) {
       throw error;

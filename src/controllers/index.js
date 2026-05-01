@@ -1,3 +1,4 @@
+const airlineController = require("./airline.controller");
 const AllianceController = require("./alliance.controller");
 const {
   updateEmployeeDetails,
@@ -35,4 +36,5 @@ module.exports = {
   deleteDocument,
   verifyDocument,
   AllianceController,
+  airlineController
 };
