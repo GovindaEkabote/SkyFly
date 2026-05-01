@@ -1,4 +1,3 @@
-const { User } = require("../models");
 const Alliance = require("../models/Schemas/allianceDetails.schema");
 
 class AllianceRepository {
@@ -32,6 +31,14 @@ class AllianceRepository {
 
   deleteById(id) {
     return Alliance.findByIdAndDelete(id);
+  }
+
+  updateStatus(allianceId, status) {
+    return Alliance.findByIdAndUpdate(
+      allianceId,
+      { $set: { status } }, // ✅ correct
+      { new: true, runValidators: true },
+    );
   }
 }
 

@@ -101,11 +101,50 @@ class AllianceController {
       const alliance = await AllianceService.deleteById(req.params.id);
       res.status(StatusCodes.OK).json({
         message: "Alliance deleted successfully",
-      })
+      });
     } catch (error) {
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: "Error in deleteAlliance Controller",
+        error,
+      });
+    }
+  }
+
+  async updateAllianceStatus(req, res, next) {
+    try {
+      const { allianceId } = req.params;
+      const {status} = req.body;
+     
+      console.log(status);
+      
+      if (!allianceId) {
+        return res.status(400).json({
+          success: false,
+          message: "Alliance ID is required",
+        });
+      }
+      const updatedAlliance = await AllianceService.updateAllianceStatus(
+        allianceId,
+        status,
+      );
+
+      if (!updatedAlliance) {
+        return res.status(404).json({
+          success: false,
+          message: "Alliance not found",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Alliance status updated successfully",
+        data: updatedAlliance,
+      });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Error in Update Alliance services",
         error,
       });
     }

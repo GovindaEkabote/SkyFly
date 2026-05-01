@@ -92,6 +92,30 @@ class AllianceService {
       });
     }
   }
+
+  async updateAllianceStatus(allianceId, status) {
+    try {
+      // 1️⃣ Validate ID
+      if (!allianceId) {
+        throw new Error("Alliance ID is required");
+      }
+
+      // 2️⃣ Validate status
+      if (!status) {
+        throw new Error("Status is required");
+      }
+
+      const update = await AllianceRepository.updateStatus(allianceId, status);
+
+      if (!update) {
+        throw new Error("Alliance not found");
+      }
+
+      return update;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = new AllianceService();

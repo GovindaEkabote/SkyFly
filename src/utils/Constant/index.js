@@ -89,7 +89,7 @@ module.exports = {
     exprienceLetter: "EXPRIENCE_LETTER",
     other: "OTHER",
   },
-  airlineStatus: {
+  airlineStatues: {
     activeAirline: "ACTIVE",
     inactiveAirline: "INACTIVE",
     suspendedAirline: "SUSPENDED",

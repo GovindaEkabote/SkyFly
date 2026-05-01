@@ -32,11 +32,18 @@ router.put(
   AllianceController.updateAlliance,
 );
 
+router.put(
+  "/update/alliance/status/:allianceId",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  AllianceController.updateAllianceStatus,
+);
+
 router.delete(
   "/delete/alliance/:id",
   token,
   roleBasedAuth(constant.airline_admin, constant.super_admin),
-  AllianceController.deleteAlliance,
+  AllianceController.deleteAlliance
 );
 
 module.exports = router;
