@@ -7,8 +7,15 @@ class AirlinRepository {
   findByCode(code) {
     return Airline.findOne({ code });
   }
+  countAirlines() {
+    return Airline.countDocuments();
+  }
+
   getAirlines(skip, limit) {
     return Airline.find().skip(skip).limit(limit);
+  }
+  getAirlineById(id) {
+    return Airline.findById(id);
   }
 }
 

@@ -11,5 +11,11 @@ router.post(
   airlineController.createAirline,
 );
 
+router.get(
+  "/get/all/airlines",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  airlineController.getAirlines,
+);
 
 module.exports = router;

@@ -16,6 +16,22 @@ class AirlineController {
       });
     }
   }
+
+  async getAirlines(req, res, next) {
+    try {
+      const { page = 1, limit = 10 } = req.query;
+      const airlines = await AirlineService.getAirlines(page, limit);
+      return res.status(StatusCodes.OK).json({
+        success: true,
+        data: airlines,
+      });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
 }
 
 module.exports = new AirlineController();
