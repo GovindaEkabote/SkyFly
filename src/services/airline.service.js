@@ -66,11 +66,17 @@ class AirlineService {
         success: false,
         message: "Error in getAirlineById",
         error,
-      });  
+      });
     }
   }
 
-  
+  async updateAirline(airlineId, data) {
+    try {
+      return await AirlineRepository.updateAirline(airlineId, data);
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = new AirlineService();

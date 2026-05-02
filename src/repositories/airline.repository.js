@@ -17,6 +17,13 @@ class AirlinRepository {
   getAirlineById(id) {
     return Airline.findById(id);
   }
+  updateAirline(airlineId, data) {
+    return Airline.findByIdAndUpdate(
+      airlineId,
+      { $set: data },
+      { new: true, runValidators: true },
+    );
+  }
 }
 
 module.exports = new AirlinRepository();
