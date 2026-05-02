@@ -32,4 +32,13 @@ router.put(
   airlineController.updateAirline,
 );
 
+
+router.delete(
+  "/delete/airline/:id",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  airlineController.deleteById,
+);
+
+
 module.exports = router;

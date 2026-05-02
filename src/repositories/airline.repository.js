@@ -17,6 +17,9 @@ class AirlinRepository {
   getAirlineById(id) {
     return Airline.findById(id);
   }
+  deleteAirline(id) {
+    return Airline.findByIdAndDelete(id);
+  }
   updateAirline(airlineId, data) {
     return Airline.findByIdAndUpdate(
       airlineId,

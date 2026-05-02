@@ -77,6 +77,21 @@ class AirlineService {
       throw error;
     }
   }
+
+  async deleteAirline(id) {
+    try {
+      const deleteAirline = AirlineRepository.deleteAirline(id);
+      if (!deleteAirline) {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          success: false,
+          message: "ID Not Found",
+        });
+      }
+      return deleteAirline;
+    } catch (error) {
+      error;
+    }
+  }
 }
 
 module.exports = new AirlineService();
