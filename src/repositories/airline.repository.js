@@ -43,6 +43,20 @@ class AirlinRepository {
     );
   }
 
+  addAllaiance(airlineId, allianceId) {
+    return Airline.findByIdAndUpdate(
+      airlineId,
+      {
+        $set: {
+          allianceDetails: allianceId,
+        },
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+  }
 }
 
 module.exports = new AirlinRepository();

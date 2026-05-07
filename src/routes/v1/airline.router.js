@@ -53,6 +53,13 @@ router.delete(
   airlineController.removeAlliance,
 );
 
+router.patch(
+  "/add/airline/alliance/:airlineId",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  airlineController.updateAirlineAlliance,
+);
+
 module.exports = router;
 
 // how many flight takeoff and visite

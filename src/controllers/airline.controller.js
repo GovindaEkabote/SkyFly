@@ -127,11 +127,33 @@ class AirlineController {
   async removeAlliance(req, res, next) {
     try {
       const { airlineId } = req.params;
-      const removeAlliance = await AirlineService.removeAllianceFromAirline(airlineId);
+      const removeAlliance =
+        await AirlineService.removeAllianceFromAirline(airlineId);
       return res.status(200).json({
         success: true,
         message: "Airline removed from alliance successfully",
-        data: removeAlliance, 
+        data: removeAlliance,
+      });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error,
+      });
+    }
+  }
+
+  async updateAirlineAlliance(req, res, next) {
+    try {
+      const { airlineId } = req.params;
+      const { allianceId } = req.body;
+      const updateAirlineAlliance = await AirlineService.addAllianceToAirline(
+        airlineId,
+        allianceId,
+      );
+      return res.status(200).json({
+        success: true,
+        message: "Airline added to alliance successfully",
+        data: updateAirlineAlliance,
       });
     } catch (error) {
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -141,5 +163,4 @@ class AirlineController {
     }
   }
 }
-
 module.exports = new AirlineController();

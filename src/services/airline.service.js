@@ -126,15 +126,30 @@ class AirlineService {
       if (!existingAirline.allianceDetails) {
         throw new Error("NO_ALLIANCE_TO_REMOVE");
       }
-      const removedAllianceName = existingAirline.allianceDetails?.name || "Unknown";
+      const removedAllianceName =
+        existingAirline.allianceDetails?.name || "Unknown";
       const updatedAirline =
-      await AirlineRepository.removeFromAlliance(airlineId);
+        await AirlineRepository.removeFromAlliance(airlineId);
       return updatedAirline;
     } catch (error) {
       throw error;
     }
   }
 
-  
+  async addAllianceToAirline(airlineId, allianceId) {
+    try {
+      if (!airlineId) {
+        throw new Error("Airline ID is required");
+      }
+      if (!allianceId) {
+        throw new Error("Alliance ID is required");
+      }
+
+      const updatedAirline = await AirlineRepository.addAllaiance(airlineId, allianceId);
+      return updatedAirline;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 module.exports = new AirlineService();
