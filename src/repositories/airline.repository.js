@@ -35,6 +35,14 @@ class AirlinRepository {
       { new: true, runValidators: true },
     );
   }
+  removeFromAlliance(airlineId) {
+    return Airline.findByIdAndUpdate(
+      airlineId,
+      { $unset: { allianceDetails: 1 } },
+      { new: true, runValidators: true },
+    );
+  }
+
 }
 
 module.exports = new AirlinRepository();

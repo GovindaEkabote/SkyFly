@@ -123,6 +123,23 @@ class AirlineController {
       });
     }
   }
+
+  async removeAlliance(req, res, next) {
+    try {
+      const { airlineId } = req.params;
+      const removeAlliance = await AirlineService.removeAllianceFromAirline(airlineId);
+      return res.status(200).json({
+        success: true,
+        message: "Airline removed from alliance successfully",
+        data: removeAlliance, 
+      });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error,
+      });
+    }
+  }
 }
 
 module.exports = new AirlineController();
