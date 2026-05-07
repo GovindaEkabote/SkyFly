@@ -1,6 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 const AirlineService = require("../services/airline.service");
-const { deleteById } = require("../repositories/alliance.repository");
+// const { deleteById } = require("../repositories/alliance.repository");
 
 class AirlineController {
   async createAirline(req, res, next) {
@@ -93,6 +93,28 @@ class AirlineController {
       const airline = await AirlineService.deleteAirline(req.params.id);
       res.status(StatusCodes.OK).json({
         message: "Airline deleted successfully",
+      });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error,
+      });
+    }
+  }
+
+  async updateAirlineStatus(req, res, next) {
+    try {
+      const { airlineId } = req.params;
+      const { status } = req.body;
+
+      const updateAirlineStaus = await AirlineService.updateStatus(
+        airlineId,
+        status,
+      );
+      return res.status(200).json({
+        success: true,
+        message: "Airline status updated successfully",
+        data: updateAirlineStaus,
       });
     } catch (error) {
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

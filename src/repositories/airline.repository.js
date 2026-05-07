@@ -27,6 +27,14 @@ class AirlinRepository {
       { new: true, runValidators: true },
     );
   }
+
+  updateAirlineStatus(airlineId, status) {
+    return Airline.findByIdAndUpdate(
+      airlineId,
+      { $set: { status } },
+      { new: true, runValidators: true },
+    );
+  }
 }
 
 module.exports = new AirlinRepository();

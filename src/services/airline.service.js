@@ -92,6 +92,27 @@ class AirlineService {
       error;
     }
   }
+
+  async updateStatus(airlineId, status) {
+    try {
+      if (!airlineId) {
+        throw new Error("Airline ID is required");
+      }
+      if (!status) {
+        throw new Error("Status is required");
+      }
+      const update = await AirlineRepository.updateAirlineStatus(
+        airlineId,
+        status,
+      );
+      if (!update) {
+        throw new Error("Airline Not found");
+      }
+      return update;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = new AirlineService();

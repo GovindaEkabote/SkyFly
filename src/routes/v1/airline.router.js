@@ -32,7 +32,6 @@ router.put(
   airlineController.updateAirline,
 );
 
-
 router.delete(
   "/delete/airline/:id",
   token,
@@ -40,5 +39,13 @@ router.delete(
   airlineController.deleteById,
 );
 
+router.put(
+  "/update/airline/status/:airlineId",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  airlineController.updateAirlineStatus,
+);
 
 module.exports = router;
+
+// how many flight takeoff and visite
