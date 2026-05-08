@@ -60,6 +60,7 @@ router.patch(
   airlineController.updateAirlineAlliance,
 );
 
-module.exports = router;
+router.get("/search", token, airlineController.searchAirlines);
 
-// how many flight takeoff and visite
+
+module.exports = router;

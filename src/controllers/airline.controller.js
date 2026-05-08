@@ -162,5 +162,21 @@ class AirlineController {
       });
     }
   }
+  async searchAirlines(req, res, next) {
+    try {
+      const { query } = req.query;
+      const airlines = await AirlineService.searchAirlines(query);
+      return res.status(200).json({
+        success: true,
+        message: "Airlines fetched successfully",
+        data: airlines,
+      });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error,
+      });
+    }
+  }
 }
 module.exports = new AirlineController();

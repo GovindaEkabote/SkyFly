@@ -112,6 +112,8 @@ class AllianceService {
       throw error;
     }
   }
+
+  
 }
 
 module.exports = new AllianceService();

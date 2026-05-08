@@ -57,6 +57,16 @@ class AirlinRepository {
       },
     );
   }
+
+  searchAirlines(query) {
+    return Airline.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { code: { $regex: query, $options: "i" } },
+        { country: { $regex: query, $options: "i" } },
+      ],
+    })
+  }
 }
 
 module.exports = new AirlinRepository();

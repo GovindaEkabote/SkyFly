@@ -151,5 +151,16 @@ class AirlineService {
       throw error;
     }
   }
+
+  async searchAirlines(query) {
+    if(!query || query.trim() === "") {
+      throw new Error("Search query cannot be empty");
+    }
+    const result = await AirlineRepository.searchAirlines(query);
+    if(result.length === 0) {
+      throw new Error("No airlines found matching the search criteria");
+    }
+    return result;
+  }
 }
 module.exports = new AirlineService();
