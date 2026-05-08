@@ -68,4 +68,16 @@ router.get(
   airlineController.getAirlinesByAllianceId,
 );
 
+router.get(
+  "/airline/with/alliances",
+  airlineController.getAllAirlinesWithAlliance,
+);
+
+router.get(
+  "/airline/alliances/:id",
+  airlineController.getAllianceWithAirlinesById,
+);
+
+router.get("/alliances/summary", airlineController.getAllianceMemberSummary);
+
 module.exports = router;

@@ -1,6 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const AirlineRepository = require("../repositories/airline.repository");
 const allianceRepository = require("../repositories/alliance.repository");
+const { default: mongoose } = require("mongoose");
 
 class AirlineService {
   async createAirline(data) {
@@ -214,6 +215,143 @@ class AirlineService {
         headquarters: airline.headquarters,
       })),
     };
+  }
+
+  async getAllAirlinesWithAlliance() {
+    try {
+      const alliancesWithAirlines =
+        await AirlineRepository.getAllAirlinesWithAlliance();
+
+      if (!alliancesWithAirlines || alliancesWithAirlines.length === 0) {
+        return {
+          message: "No airlines found with alliance membership",
+          totalAlliances: 0,
+          totalAirlines: 0,
+          alliances: [],
+        };
+      }
+
+      // Calculate total airlines across all alliances
+      const totalAirlines = alliancesWithAirlines.reduce(
+        (sum, alliance) => sum + alliance.memberCount,
+        0,
+      );
+
+      // Format the response with additional statistics
+      const formattedAlliances = alliancesWithAirlines.map((alliance) => ({
+        allianceId: alliance._id,
+        allianceName: alliance.allianceName,
+        allianceCode: alliance.allianceCode,
+        memberCount: alliance.memberCount,
+        airlines: alliance.airlines.map((airline) => ({
+          airlineId: airline.id,
+          code: airline.code,
+          name: airline.name,
+          country: airline.country,
+          status: airline.status,
+          // Add airline age or additional info if needed
+          isActive: airline.status === "active",
+        })),
+        // Calculate active members count for each alliance
+        activeMembers: alliance.airlines.filter((a) => a.status === "active")
+          .length,
+        inactiveMembers: alliance.airlines.filter((a) => a.status !== "active")
+          .length,
+      }));
+
+      return {
+        summary: {
+          totalAlliances: formattedAlliances.length,
+          totalAirlines: totalAirlines,
+          averageAirlinesPerAlliance: (
+            totalAirlines / formattedAlliances.length
+          ).toFixed(2),
+          generatedAt: new Date().toISOString(),
+        },
+        alliances: formattedAlliances,
+      };
+    } catch (error) {
+      throw new Error(`Error fetching airlines by alliance: ${error.message}`);
+    }
+  }
+
+  async getAllianceWithAirlinesById(allianceId) {
+    if (!allianceId || !mongoose.Types.ObjectId.isValid(allianceId)) {
+      throw new Error("Invalid alliance ID format");
+    }
+
+    const alliances = await AirlineRepository.getAllAirlinesWithAlliance();
+
+    const targetAlliance = alliances.find(
+      (alliance) => alliance._id.toString() === allianceId.toString(),
+    );
+
+    if (!targetAlliance) {
+      return {
+        message: "No alliance found with the specified ID",
+        allianceId: allianceId,
+        exists: false,
+      };
+    }
+
+    return {
+      exists: true,
+      alliance: {
+        id: targetAlliance._id,
+        name: targetAlliance.allianceName,
+        code: targetAlliance.allianceCode,
+        memberCount: targetAlliance.memberCount,
+        airlines: targetAlliance.airlines.map((airline) => ({
+          id: airline.id,
+          code: airline.code,
+          name: airline.name,
+          country: airline.country,
+          status: airline.status,
+          // Add additional details from database if needed
+          canBeExpanded: true,
+        })),
+        statistics: {
+          totalMembers: targetAlliance.memberCount,
+          activeMembers: targetAlliance.airlines.filter(
+            (a) => a.status === "active",
+          ).length,
+          countriesRepresented: [
+            ...new Set(targetAlliance.airlines.map((a) => a.country)),
+          ].length,
+        },
+      },
+    };
+  }
+
+  async getAllianceMemberSummary() {
+    const alliances = await AirlineRepository.getAllAirlinesWithAlliance();
+
+    if (!alliances || alliances.length === 0) {
+      return {
+        message: "No alliance data available",
+        totalAlliances: 0,
+        totalAirlines: 0,
+      };
+    }
+
+    // Prepare summary data for dashboard/statistics
+    const summary = {
+      totalAlliances: alliances.length,
+      totalAirlines: alliances.reduce((sum, a) => sum + a.memberCount, 0),
+      largestAlliance: alliances.reduce((largest, current) =>
+        current.memberCount > largest.memberCount ? current : largest,
+      ),
+      smallestAlliance: alliances.reduce((smallest, current) =>
+        current.memberCount < smallest.memberCount ? current : smallest,
+      ),
+      allianceNames: alliances.map((a) => ({
+        name: a.allianceName,
+        code: a.allianceCode,
+        members: a.memberCount,
+      })),
+    };
+
+    return summary;
   }
 }
 module.exports = new AirlineService();

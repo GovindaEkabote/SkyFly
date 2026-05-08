@@ -198,6 +198,107 @@ class AirlineController {
     }
   }
 
-  
+  async getAllAirlinesWithAlliance(req, res, next) {
+    try {
+      const result = await AirlineService.getAllAirlinesWithAlliance();
+
+      res.status(200).json({
+        success: true,
+        statusCode: 200,
+        timestamp: new Date().toISOString(),
+        data: result,
+      });
+    } catch (error) {
+      console.error("Error in getAllAirlinesWithAlliance:", error);
+
+      res.status(500).json({
+        success: false,
+        statusCode: 500,
+        error: "Failed to fetch airlines by alliance",
+        message: error.message,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+
+  async getAllianceWithAirlinesById(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({
+          success: false,
+          statusCode: 400,
+          error: "Alliance ID is required",
+          message: "Please provide a valid alliance ID",
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      const result = await AirlineService.getAllianceWithAirlinesById(id);
+
+      if (!result.exists) {
+        return res.status(404).json({
+          success: false,
+          statusCode: 404,
+          error: "Alliance not found",
+          message: `No alliance found with ID: ${id}`,
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        statusCode: 200,
+        timestamp: new Date().toISOString(),
+        data: result,
+      });
+    } catch (error) {
+      console.error("Error in getAllianceWithAirlinesById:", error);
+
+      // Handle invalid ObjectId error
+      if (error.message.includes("Invalid alliance ID format")) {
+        return res.status(400).json({
+          success: false,
+          statusCode: 400,
+          error: "Invalid ID format",
+          message: error.message,
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      res.status(500).json({
+        success: false,
+        statusCode: 500,
+        error: "Failed to fetch alliance details",
+        message: error.message,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+
+  async getAllianceMemberSummary(req, res) {
+    try {
+      const result = await AirlineService.getAllianceMemberSummary();
+      
+      res.status(200).json({
+        success: true,
+        statusCode: 200,
+        timestamp: new Date().toISOString(),
+        data: result
+      });
+      
+    } catch (error) {
+      console.error('Error in getAllianceMemberSummary:', error);
+      
+      res.status(500).json({
+        success: false,
+        statusCode: 500,
+        error: 'Failed to fetch alliance summary',
+        message: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
 }
 module.exports = new AirlineController();
