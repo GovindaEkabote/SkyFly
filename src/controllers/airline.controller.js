@@ -178,5 +178,26 @@ class AirlineController {
       });
     }
   }
+
+  async getAirlinesByAllianceId(req, res, next) {
+    try {
+      const { allianceId } = req.params;
+
+      const airlines = await AirlineService.findByAllianceId(allianceId);
+
+      return res.status(200).json({
+        success: true,
+        message: "Airlines fetched successfully",
+        data: airlines,
+      });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  
 }
 module.exports = new AirlineController();

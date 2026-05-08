@@ -57,7 +57,6 @@ class AirlinRepository {
       },
     );
   }
-
   searchAirlines(query) {
     return Airline.find({
       $or: [
@@ -65,7 +64,65 @@ class AirlinRepository {
         { code: { $regex: query, $options: "i" } },
         { country: { $regex: query, $options: "i" } },
       ],
-    })
+    });
+  }
+
+  findByAllianceId(allianceId) {
+    return (
+      Airline.find({
+        allianceDetails: allianceId,
+        isDeleted: false,
+        status: { $ne: "inactive" },
+      })
+        .populate("allianceDetails", "name code description")
+        // .populate("hubs", "name code city country")
+        .sort({ name: 1 })
+    );
+  }
+
+  getAllAirlinesWithAlliance() {
+    return Airline.aggregate([
+      {
+        $match: {
+          isDeleted: false,
+          allianceDetails: { $exists: true, $ne: null },
+        },
+      },
+      {
+        $lookup: {
+          from: "alliances",
+          localField: "allianceDetails",
+          foreignField: "_id",
+          as: "allianceInfo",
+        },
+      },
+      {
+        $unwind: {
+          path: "$allianceInfo",
+          preserveNullAndEmptyArrays: false,
+        },
+      },
+      {
+        $group: {
+          _id: "$allianceInfo._id",
+          allianceName: { $first: "$allianceInfo.name" },
+          allianceCode: { $first: "$allianceInfo.code" },
+          memberCount: { $sum: 1 },
+          airlines: {
+            $push: {
+              id: "$_id",
+              code: "$code",
+              name: "$name",
+              country: "$country",
+              status: "$status",
+            },
+          },
+        },
+      },
+      {
+        $sort: { allianceName: 1 },
+      },
+    ]);
   }
 }
 

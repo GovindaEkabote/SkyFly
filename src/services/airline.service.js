@@ -145,7 +145,10 @@ class AirlineService {
         throw new Error("Alliance ID is required");
       }
 
-      const updatedAirline = await AirlineRepository.addAllaiance(airlineId, allianceId);
+      const updatedAirline = await AirlineRepository.addAllaiance(
+        airlineId,
+        allianceId,
+      );
       return updatedAirline;
     } catch (error) {
       throw error;
@@ -153,14 +156,64 @@ class AirlineService {
   }
 
   async searchAirlines(query) {
-    if(!query || query.trim() === "") {
+    if (!query || query.trim() === "") {
       throw new Error("Search query cannot be empty");
     }
     const result = await AirlineRepository.searchAirlines(query);
-    if(result.length === 0) {
+    if (result.length === 0) {
       throw new Error("No airlines found matching the search criteria");
     }
     return result;
+  }
+
+  async findByAllianceId(allianceId) {
+    if (!allianceId) {
+      throw new Error("Alliance ID is required");
+    }
+
+    const airlines = await AirlineRepository.findByAllianceId(allianceId);
+
+    if (!airlines || airlines.length === 0) {
+      return {
+        success: false,
+        message: "No airlines found for the given alliance ID",
+        count: 0,
+        data: [],
+      };
+    }
+
+    const allianceInfo = airlines[0].allianceDetails || null;
+
+    return {
+      alliance: allianceInfo
+        ? {
+            id: allianceInfo._id,
+            name: allianceInfo.name,
+            code: allianceInfo.code,
+            description: allianceInfo.description,
+          }
+        : null,
+
+      totalAirlines: airlines.length,
+
+      airlines: airlines.map((airline) => ({
+        id: airline._id,
+        code: airline.code,
+        name: airline.name,
+        country: airline.country,
+        status: airline.status,
+
+        hubs: airline.hubs.map((hub) => ({
+          code: hub.code,
+          name: hub.name,
+          city: hub.city,
+          country: hub.country,
+        })),
+
+        contactInfo: airline.contactInfo,
+        headquarters: airline.headquarters,
+      })),
+    };
   }
 }
 module.exports = new AirlineService();

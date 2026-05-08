@@ -62,5 +62,10 @@ router.patch(
 
 router.get("/search", token, airlineController.searchAirlines);
 
+router.get(
+  "/alliances/:allianceId/airlines",
+  token,
+  airlineController.getAirlinesByAllianceId,
+);
 
 module.exports = router;
