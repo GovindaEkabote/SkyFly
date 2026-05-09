@@ -1,4 +1,5 @@
 const airlineRepository = require("./airline.repository");
+const AirportRepository = require("./airport.repository");
 const AllianceRepository = require("./alliance.repository");
 const {
   updateUserById,
@@ -23,5 +24,6 @@ module.exports = {
   getUserByIdWithDocuments,
   verifyUserDocument,
   AllianceRepository,
-  airlineRepository
+  airlineRepository,
+  AirportRepository
 };
