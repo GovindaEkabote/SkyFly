@@ -75,7 +75,7 @@ class AirlinRepository {
         status: { $ne: "inactive" },
       })
         .populate("allianceDetails", "name code description")
-        // .populate("hubs", "name code city country")
+        .populate("hubs", "name code city country")
         .sort({ name: 1 })
     );
   }

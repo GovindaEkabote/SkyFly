@@ -1,4 +1,4 @@
-const {Airport} = require("../models/index");
+const { Airport } = require("../models/index");
 
 class AirportRepository {
   createAirport(data) {
@@ -7,7 +7,7 @@ class AirportRepository {
   codeExist(code) {
     return Airport.findOne({ code });
   }
-  getAirportById(id){
+  getAirportById(id) {
     return Airport.findById(id);
   }
 
@@ -15,6 +15,17 @@ class AirportRepository {
     return Airport.find().skip(skip).limit(limit);
   }
 
+  updateAirport(id, data) {
+    return Airport.findByIdAndUpdate(
+      id,
+      { $set: data },
+      { new: true, runValidators: true },
+    );
+  }
+
+  deleteAirport(id) {
+    return Airport.findByIdAndDelete(id);
+  }
 }
 
 module.exports = new AirportRepository();

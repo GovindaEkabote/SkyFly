@@ -46,6 +46,30 @@ class Airport {
       throw error;
     }
   }
+
+  async updateAirportById(id, data) {
+    try {
+      const updatedAirport = await AirportRepository.updateAirport(id, data);
+      if (!updatedAirport) {
+        throw new Error("Airport not found");
+      }
+      return updatedAirport;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteAirportById(id) {
+    try {
+      const deletedAirport = await AirportRepository.deleteAirport(id);
+      if (!deletedAirport) {
+        throw new Error("Airport not found");
+      }
+      return deletedAirport;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = new Airport();

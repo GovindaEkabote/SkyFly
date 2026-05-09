@@ -48,6 +48,43 @@ class AirportController {
       });
     }
   }
+
+  async updateAirportById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const updatedAirport = await AirportService.updateAirportById(
+        id,
+        req.body,
+      );
+
+      return res.status(StatusCodes.OK).json({
+        success: true,
+        message: "Airport updated successfully",
+        data: updatedAirport,
+      });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  async deleteAirportById(req, res, next) {
+    try {
+      const { id } = req.params;
+      await AirportService.deleteAirportById(id);
+      return res.status(StatusCodes.OK).json({
+        success: true,
+        message: "Airport deleted successfully",
+      });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 
+        success: false,
+        message: error.message,
+      });
+    }
+  }
 }
 
 module.exports = new AirportController();

@@ -44,7 +44,7 @@ const airportSchema = new mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: ["active", "inactive", "under maintenance"],
+      enum: ["active", "inactive", "under_maintenance"],
       default: "active",
     },
     operatingAirlines: [

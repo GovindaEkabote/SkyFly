@@ -23,4 +23,18 @@ router.get(
   airportController.getAirportsController,
 );
 
+router.put(
+  "/update/airport/:id",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  airportController.updateAirportById,
+);
+
+router.delete(
+  "/delete/airport/:id",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  airportController.deleteAirportById,
+);
+
 module.exports = router;
