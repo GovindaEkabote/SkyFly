@@ -85,6 +85,24 @@ class AirportController {
       });
     }
   }
+
+  async updateAirportStatus(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      const updatedAirport = await AirportService.updateAirportStatus(id, status);
+      return res.status(StatusCodes.OK).json({
+        success: true,
+        message: "Airport status updated successfully",
+        data: updatedAirport,
+      });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
 }
 
 module.exports = new AirportController();

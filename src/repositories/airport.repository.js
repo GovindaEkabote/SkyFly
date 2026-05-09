@@ -26,6 +26,15 @@ class AirportRepository {
   deleteAirport(id) {
     return Airport.findByIdAndDelete(id);
   }
+
+  updateAirportStatus(id, status) {
+    return Airport.findByIdAndUpdate(
+      id,
+      { $set: { status } },
+      { new: true, runValidators: true },
+    );
+  }
+  
 }
 
 module.exports = new AirportRepository();

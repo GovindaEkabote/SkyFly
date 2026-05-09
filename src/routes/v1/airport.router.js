@@ -37,4 +37,11 @@ router.delete(
   airportController.deleteAirportById,
 );
 
+router.patch(
+  "/update/airport/status/:id",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  airportController.updateAirportStatus,
+);
+
 module.exports = router;

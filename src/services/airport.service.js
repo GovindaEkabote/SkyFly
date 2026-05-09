@@ -70,6 +70,18 @@ class Airport {
       throw error;
     }
   }
+
+  async updateAirportStatus(id, status) {
+    try {
+      const updatedAirport = await AirportRepository.updateAirportStatus( id, status);
+      if (!updatedAirport) {
+        throw new Error("Airport not found");
+      }
+      return updatedAirport;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = new Airport();
