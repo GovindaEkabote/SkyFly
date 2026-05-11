@@ -1,7 +1,7 @@
 const expess = require("express");
 const { constant } = require("../../utils");
 const { roleBasedAuth, token } = require("../../middlewares");
-const {airportController} = require("../../controllers");
+const { airportController } = require("../../controllers");
 const router = expess.Router();
 
 router.post(
@@ -17,11 +17,7 @@ router.get(
   airportController.getAirportByIdController,
 );
 
-router.get(
-  "/get/all/airports",
-  token,
-  airportController.getAirportsController,
-);
+router.get("/get/all/airports", token, airportController.getAirportsController);
 
 router.put(
   "/update/airport/:id",
@@ -42,6 +38,24 @@ router.patch(
   token,
   roleBasedAuth(constant.airline_admin, constant.super_admin),
   airportController.updateAirportStatus,
+);
+
+router.get(
+  "/find/airport/status",
+  token,
+  airportController.findAirportByStatus,
+);
+
+router.get(
+  "/find/airport/code",
+  token,
+  airportController.findAirportByCode,
+);
+
+router.get(
+  "/search/airports",
+  token,
+  airportController.searchAirports,
 );
 
 module.exports = router;

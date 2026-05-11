@@ -33,13 +33,7 @@ class AllianceRepository {
     return Alliance.findByIdAndDelete(id);
   }
 
-  updateStatus(allianceId, status) {
-    return Alliance.findByIdAndUpdate(
-      allianceId,
-      { $set: { status } }, // ✅ correct
-      { new: true, runValidators: true },
-    );
-  }
+  
 }
 
 module.exports = new AllianceRepository();

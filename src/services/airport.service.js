@@ -1,6 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 const AirlineRepository = require("../repositories/airline.repository");
-const allianceRepository = require("../repositories/alliance.repository");
+const { AllianceRepository } = require("../repositories/index");
 const { AirportRepository } = require("../repositories/index");
 
 class Airport {
@@ -73,11 +73,50 @@ class Airport {
 
   async updateAirportStatus(id, status) {
     try {
-      const updatedAirport = await AirportRepository.updateAirportStatus( id, status);
+      const updatedAirport = await AirportRepository.updateAirportStatus(
+        id,
+        status,
+      );
       if (!updatedAirport) {
         throw new Error("Airport not found");
       }
       return updatedAirport;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findAirportByStatus(status) {
+    try {
+      const airports = await AirportRepository.findAirportByStatus(status);
+      if (airports.length === 0) {
+        throw new Error("No airports found with the given status");
+      }
+      return airports;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findAirportByCode(code) {
+    try {
+      const airports = await AirportRepository.findAirportByCode(code);
+      if (airports.length === 0) {
+        throw new Error("No airports found with the given code");
+      }
+      return airports;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async searchAirports(query) {
+    try {
+      const airports = await AirportRepository.searchAirports(query);
+      if (airports.length === 0) {
+        throw new Error("No airports found matching the search query");
+      }
+      return airports;
     } catch (error) {
       throw error;
     }

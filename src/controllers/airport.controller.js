@@ -103,6 +103,54 @@ class AirportController {
       });
     }
   }
+ 
+  async findAirportByStatus(req, res, next) {
+    try {
+      const { status } = req.query;
+      const airports = await AirportService.findAirportByStatus(status);
+      return res.status(StatusCodes.OK).json({
+        success: true,
+        data: airports,
+      });
+    }catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  async findAirportByCode(req, res, next) {
+    try {
+      const { code } = req.query;
+      const airports = await AirportService.findAirportByCode(code);
+      return res.status(StatusCodes.OK).json({
+        success: true,
+        data: airports,
+      });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  async searchAirports(req, res, next) {
+    try {
+      const { query } = req.query;
+      const airports = await AirportService.searchAirports(query);
+      return res.status(StatusCodes.OK).json({
+        success: true,
+        data: airports,
+      });
+    } catch (error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
 }
 
 module.exports = new AirportController();
