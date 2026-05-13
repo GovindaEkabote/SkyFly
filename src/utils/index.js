@@ -17,5 +17,9 @@ module.exports = {
   transporter: transporter,
   generateOtp: generateOtp,
   DOCUMENT_TYPES  : constants.DOCUMENT_TYPES,
-  airlineStatues : constants.airlineStatues
+  airlineStatues : constants.airlineStatues,
+  maintenance : constants.maintenance,
+  priority : constants.priority,
+  maintenanceStatus : constants.maintenanceStatus,
+
 };

@@ -57,6 +57,15 @@ class AirlinRepository {
       },
     );
   }
+
+  addHub(airlineId, airportId) {
+    return Airline.findByIdAndUpdate(
+      airlineId,
+      { $addToSet: { hubs: airportId } },
+      { new: true, runValidators: true },
+    );
+  }
+
   searchAirlines(query) {
     return Airline.find({
       $or: [
@@ -68,16 +77,14 @@ class AirlinRepository {
   }
 
   findByAllianceId(allianceId) {
-    return (
-      Airline.find({
-        allianceDetails: allianceId,
-        isDeleted: false,
-        status: { $ne: "inactive" },
-      })
-        .populate("allianceDetails", "name code description")
-        .populate("hubs", "name code city country")
-        .sort({ name: 1 })
-    );
+    return Airline.find({
+      allianceDetails: allianceId,
+      isDeleted: false,
+      status: { $ne: "inactive" },
+    })
+      .populate("allianceDetails", "name code description")
+      .populate("hubs", "name code city country")
+      .sort({ name: 1 });
   }
 
   getAllAirlinesWithAlliance() {
@@ -123,6 +130,14 @@ class AirlinRepository {
         $sort: { allianceName: 1 },
       },
     ]);
+  }
+
+  addHubToAirline(airlineId, airportId) {
+    return Airline.findByIdAndUpdate(
+      airlineId,
+      { $addToSet: { hubs: airportId } },
+      { new: true, runValidators: true },
+    );
   }
 }
 

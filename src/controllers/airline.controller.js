@@ -280,23 +280,58 @@ class AirlineController {
   async getAllianceMemberSummary(req, res) {
     try {
       const result = await AirlineService.getAllianceMemberSummary();
-      
+
       res.status(200).json({
         success: true,
         statusCode: 200,
         timestamp: new Date().toISOString(),
-        data: result
+        data: result,
       });
-      
     } catch (error) {
-      console.error('Error in getAllianceMemberSummary:', error);
-      
+      console.error("Error in getAllianceMemberSummary:", error);
+
       res.status(500).json({
         success: false,
         statusCode: 500,
-        error: 'Failed to fetch alliance summary',
+        error: "Failed to fetch alliance summary",
         message: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+
+  async addHubToAirline(req, res, next) {
+    try {
+      const { airlineId } = req.params;
+      const { airportId } = req.body;
+
+      if (!airlineId || !airportId) {
+        return res.status(400).json({
+          success: false,
+          statusCode: 400,
+          error: "Airline ID and Airport ID are required",
+          message: "Please provide both airline and airport IDs",
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      const updatedAirline = await AirlineService.addHubToAirline(
+        airlineId,
+        airportId,
+      );
+
+      res.status(200).json({
+        success: true,
+        statusCode: 200,
+        timestamp: new Date().toISOString(),
+        data: updatedAirline,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message,
+        stack: error.stack,
       });
     }
   }

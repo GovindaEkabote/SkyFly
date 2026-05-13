@@ -80,4 +80,13 @@ router.get(
 
 router.get("/alliances/summary", airlineController.getAllianceMemberSummary);
 
+router.patch(
+  "/airlines/:airlineId/hubs",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  airlineController.addHubToAirline,
+);
+
+
+
 module.exports = router;

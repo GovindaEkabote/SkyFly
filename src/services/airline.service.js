@@ -156,6 +156,25 @@ class AirlineService {
     }
   }
 
+  async addHubToAirline(airlineId, airportId) {
+    try {
+      if (!airlineId) {
+        throw new Error("Airline ID is required");
+      }
+      if (!airportId) {
+        throw new Error("Airport ID is required");
+      }
+
+      const updatedAirline = await AirlineRepository.addHubToAirline(
+        airlineId,
+        airportId
+      );
+      return updatedAirline;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async searchAirlines(query) {
     if (!query || query.trim() === "") {
       throw new Error("Search query cannot be empty");
@@ -353,5 +372,7 @@ class AirlineService {
 
     return summary;
   }
+
+
 }
 module.exports = new AirlineService();
