@@ -30,10 +30,23 @@ class AircraftRepository {
   }
 
   deleteAircraft(id) {
+    return Aircraft.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+  }
+
+  getAircraftFleet(id) {
+    return Aircraft.find({
+      airline: id,
+      isDeleted: false,
+    })
+      .populate("airline", "name code")
+      .sort({ createdAt: -1 });
+  }
+
+  updateAircraftStatus(id, status) {
     return Aircraft.findByIdAndUpdate(
       id,
-      { isDeleted: true },
-      { new: true },
+      { $set: { status } },
+      { new: true, runValidators: true },
     );
   }
 }

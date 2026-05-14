@@ -76,6 +76,39 @@ class AircraftController {
       next(error);
     }
   }
+
+  async getAirlineFleet(req, res, next) {
+    try {
+      const { id } = req.params;
+      const aircraft = await aircraftService.getAircraftFleet(id);
+
+      return res.status(StatusCodes.OK).json({
+        success: true,
+        count: aircraft.length,
+        data: aircraft,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  async updateAircraftStatus(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      const updatedAircraft = await aircraftService.updateAircraftStatus(id, status);
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: "Aircraft status updated successfully",
+        data: updatedAircraft,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new AircraftController();

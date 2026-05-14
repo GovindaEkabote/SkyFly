@@ -88,6 +88,36 @@ class AircraftService {
       throw error;
     }
   }
+
+  async getAircraftFleet(id) {
+    try {
+      const fleetAircraft = await aircraftRepository.getAircraftFleet(id);
+      if (fleetAircraft.length === 0) {
+        throw {
+          status: StatusCodes.NOT_FOUND,
+          message: "No aircraft found for this fleet",
+        };
+      }
+      return fleetAircraft;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateAircraftStatus(id, status) {
+    try {
+      const updatedAircraft = await aircraftRepository.updateAircraftStatus(id, status);
+      if (!updatedAircraft) {
+        throw {
+          status: StatusCodes.NOT_FOUND,
+          message: "Aircraft not found",
+        };
+      }
+      return updatedAircraft;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = new AircraftService();
