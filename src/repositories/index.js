@@ -1,6 +1,8 @@
+const aircraftRepository = require("./aircraft.repository");
 const airlineRepository = require("./airline.repository");
 const AirportRepository = require("./airport.repository");
 const AllianceRepository = require("./alliance.repository");
+const maintenanceRepository = require("./maintenance.repository");
 const {
   updateUserById,
   getUserById,
@@ -10,7 +12,7 @@ const {
   getAllDocuments,
   saveUser,
   getUserByIdWithDocuments,
-  verifyUserDocument
+  verifyUserDocument,
 } = require("./user.repository");
 
 module.exports = {
@@ -25,5 +27,7 @@ module.exports = {
   verifyUserDocument,
   AllianceRepository,
   airlineRepository,
-  AirportRepository
+  AirportRepository,
+  maintenanceRepository,
+  aircraftRepository,
 };

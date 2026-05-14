@@ -1,6 +1,8 @@
+const aircraftService = require("./aircraft.service");
 const AirportService = require("./airport.service");
 const allianceService = require("./alliance.service");
 const { sendOtpEmail } = require("./email.service");
+const maintenanceService = require("./maintenance.service");
 const {
   updateEmployeeDetails,
   updatePilotDetails,
@@ -39,5 +41,7 @@ module.exports = {
   deleteUserDocument: deleteUserDocument,
   verifyDocument: verifyDocument,
   allianceService,
-  AirportService
+  AirportService,
+  maintenanceService,
+  aircraftService
 };

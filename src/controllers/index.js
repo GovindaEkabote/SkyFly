@@ -1,6 +1,8 @@
 const airlineController = require("./airline.controller");
 const airportController = require("./airport.controller");
 const AllianceController = require("./alliance.controller");
+const maintenanceController = require("./maintenance.controller");
+const aircraftController = require("./aircraft.controller");
 const {
   updateEmployeeDetails,
   updatePilotDetails,
@@ -38,6 +40,8 @@ module.exports = {
   verifyDocument,
   AllianceController,
   airlineController,
-  airportController ,
+  airportController,
+  maintenanceController,
+  aircraftController
 
 };

@@ -1,3 +1,4 @@
+
 // utils/constants.js
 module.exports = {
   // User roles
@@ -94,27 +95,27 @@ module.exports = {
     inactiveAirline: "INACTIVE",
     suspendedAirline: "SUSPENDED",
   },
-  maintenance:{
-    A_check : "A_CHECK",
-    C_check : "C_CHECK",
-    engine_overhaul : "ENGINE_OVERHAUL",
-    landing_gear : "LANDING_GEAR",
-    avionics : "AVIONICS",
-    emergency :  "EMERGENCY",
-    scheduled : "SCHEDULED"
+  maintenance: {
+    A_check: "A_CHECK",
+    C_check: "C_CHECK",
+    engine_overhaul: "ENGINE_OVERHAUL",
+    landing_gear: "LANDING_GEAR",
+    avionics: "AVIONICS",
+    emergency: "EMERGENCY",
+    scheduled: "SCHEDULED",
   },
-  priority:{
-    low :  "LOW",
-    medium : "MEDIUM",
-    high : "HIGH",
-    critical : "CRITICAL"
+  priority: {
+    low: "LOW",
+    medium: "MEDIUM",
+    high: "HIGH",
+    critical: "CRITICAL",
   },
-  maintenanceStatus:{
-    scheduled : "SCHEDULED",
-    in_progress : "IN_PROGRESS",
-    completed : "COMPLETED",
-    delayed : "DELAYED",
-    cancelled : "CANCELLED"
+  maintenanceStatus: {
+    scheduled: "SCHEDULED",
+    in_progress: "IN_PROGRESS",
+    completed: "COMPLETED",
+    delayed: "DELAYED",
+    cancelled: "CANCELLED",
   },
   
 };

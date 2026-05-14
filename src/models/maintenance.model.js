@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { constant, maintenance, priority } = require("../utils");
+const Constant = require("../utils/Constant");
 
 const maintenanceSchema = new mongoose.Schema(
   {
@@ -17,27 +18,30 @@ const maintenanceSchema = new mongoose.Schema(
       type: String,
       enum: [
         maintenance.A_check,
-        maintenance.B_check,
+        maintenance.engine_overhaul,
         maintenance.C_check,
-        maintenance.D_check,
+        maintenance.landing_gear,
+        maintenance.avionics,
+        maintenance.emergency,
+        maintenance.scheduled,
       ],
       required: true,
     },
     priority: {
       type: String,
-      enum: [priority.Low, priority.Medium, priority.High, priority.Critical],
+      enum: [priority.low, priority.medium, priority.high, priority.critical],
       required: true,
     },
     status: {
       type: String,
       enum: [
-        constant.maintenanceStatus.SCHEDULED,
-        constant.maintenanceStatus.IN_PROGRESS,
-        constant.maintenanceStatus.COMPLETED,
-        constant.maintenanceStatus.DELAYED,
-        constant.maintenanceStatus.CANCELLED,
+        Constant.maintenanceStatus.scheduled,
+        Constant.maintenanceStatus.in_progress,
+        Constant.maintenanceStatus.completed,
+        Constant.maintenanceStatus.delayed,
+        Constant.maintenanceStatus.cancelled,
       ],
-      default: constant.maintenanceStatus.SCHEDULED,
+      default: Constant.maintenanceStatus.scheduled,
     },
     scheduledDate: {
       type: Date,
@@ -89,7 +93,7 @@ const maintenanceSchema = new mongoose.Schema(
       {
         url: String,
         publicId: String,
-        type: String, // 'invoice', 'report', 'certificate'
+        type: String,
         uploadedAt: { type: Date, default: Date.now },
       },
     ],
