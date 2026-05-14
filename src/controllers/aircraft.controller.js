@@ -14,6 +14,20 @@ class AircraftController {
       next(error);
     }
   }
+
+  async getAll(req, res, next) {
+    try {
+      const { page = 1, limit = 10 } = req.query;
+      const result = await aircraftService.getAllAircraft(page, limit);
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: "Aircraft retrieved successfully",
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new AircraftController();

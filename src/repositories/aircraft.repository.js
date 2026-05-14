@@ -9,7 +9,13 @@ class AircraftRepository {
     return Aircraft.findOne({ registration, isDeleted: false });
   }
 
-  
+  countAircraft() {
+    return Aircraft.countDocuments({ isDeleted: false });
+  }
+
+  findAircraft(skip, limit) {
+    return Aircraft.find({ isDeleted: false }).skip(skip).limit(limit);
+  }
 }
 
 module.exports = new AircraftRepository();
