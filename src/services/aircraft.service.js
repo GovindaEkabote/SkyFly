@@ -43,6 +43,51 @@ class AircraftService {
       throw error;
     }
   }
+
+  async getAircraftById(id) {
+    try {
+      const aircraft = await aircraftRepository.getAircraftById(id);
+      if (!aircraft) {
+        throw {
+          status: StatusCodes.NOT_FOUND,
+          message: "Aircraft not found",
+        };
+      }
+      return aircraft;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateAircraft(id, data) {
+    try {
+      const updatedAircraft = await aircraftRepository.updateAircraft(id, data);
+      if (!updatedAircraft) {
+        throw {
+          status: StatusCodes.NOT_FOUND,
+          message: "Aircraft not found",
+        };
+      }
+      return updatedAircraft;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteAircraft(id) {
+    try {
+      const deletedAircraft = await aircraftRepository.deleteAircraft(id);
+      if (!deletedAircraft) {
+        throw {
+          status: StatusCodes.NOT_FOUND,
+          message: "Aircraft not found",
+        };
+      }
+      return deletedAircraft;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = new AircraftService();
