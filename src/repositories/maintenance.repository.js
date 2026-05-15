@@ -101,43 +101,38 @@ class MaintenanceRepository {
   }
 
   async findOverlappingMaintenance(
-  aircraftId,
-  scheduledDate,
-  excludeId = null,
-) {
-  try {
+    aircraftId,
+    scheduledDate,
+    excludeId = null,
+  ) {
+    try {
+      const query = {
+        aircraft: aircraftId,
 
-    const query = {
-      aircraft: aircraftId,
+        status: {
+          $in: [maintenanceStatus.scheduled, maintenanceStatus.in_progress],
+        },
 
-      status: {
-        $in: [
-          maintenanceStatus.scheduled,
-          maintenanceStatus.in_progress,
-        ],
-      },
+        scheduledDate: {
+          $gte: new Date(scheduledDate),
 
-      scheduledDate: {
-        $gte: new Date(scheduledDate),
-
-        $lt: new Date(
-          new Date(scheduledDate).setDate(
-            new Date(scheduledDate).getDate() + 1,
+          $lt: new Date(
+            new Date(scheduledDate).setDate(
+              new Date(scheduledDate).getDate() + 1,
+            ),
           ),
-        ),
-      },
-    };
+        },
+      };
 
-    if (excludeId) {
-      query._id = { $ne: excludeId };
+      if (excludeId) {
+        query._id = { $ne: excludeId };
+      }
+
+      return await Maintenance.find(query);
+    } catch (error) {
+      throw error;
     }
-
-    return await Maintenance.find(query);
-
-  } catch (error) {
-    throw error;
   }
-}
   async validateReferences(airlineId, aircraftId) {
     try {
       const [airline, aircraft] = await Promise.all([
@@ -154,6 +149,33 @@ class MaintenanceRepository {
     } catch (error) {
       throw error;
     }
+  }
+
+  countMaintenanceRecords() {
+    return Maintenance.countDocuments();
+  }
+
+  async findAllMaintenance(skip, limit) {
+    return await Maintenance.find()
+      .populate("createdBy", "name  email")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+  }
+
+  async getMaintenanceById(id) {
+    return await Maintenance.findById(id)
+      .populate("airline", "code name status")
+      .populate("aircraft", "registration model manufacturer")
+      .populate("createdBy", "name  email");
+  }
+
+  async updateStatus(id, status) {
+    return await Maintenance.findByIdAndUpdate(
+      id,
+      { $set: { status } },
+      { new: true, runValidators: true },
+    );
   }
 }
 

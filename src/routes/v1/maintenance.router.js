@@ -7,9 +7,23 @@ const router = express.Router();
 router.post(
   "/maintananace",
   token,
-  roleBasedAuth(constant.airline_admin, constant.super_admin), 
-  maintenanceController.createMaintenance
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  maintenanceController.createMaintenance,
 );
 
+router.get("/maintananace", token, maintenanceController.getAllMaintenance);
+
+router.get(
+  "/maintananace/:id",
+  token,
+  maintenanceController.getMaintenanceById,
+);
+
+router.patch(
+  "/maintananace/update/:id",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  maintenanceController.updateStatus,
+);
 
 module.exports = router;
