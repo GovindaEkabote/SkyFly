@@ -79,6 +79,47 @@ class MaintenanceController {
       });
     }
   }
+
+  async updateMaintenanceRecord(req, res, next) {
+    try {
+      const { id } = req.params;
+      const data = req.body;
+      const updatedRecord = await maintenanceService.updateData(id, data);
+      if (!updatedRecord) {
+        res.status(StatusCodes.NOT_FOUND).json({
+          success: false,
+          message: "Record Not Found",
+        });
+      }
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: "Record updated successfully",
+        data: updatedRecord,
+      });
+    } catch (error) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  async deleteRecord(req, res, next) {
+    try {
+      const { id } = req.params;
+      const deleteRecord = await maintenanceService.softdelete(id);
+      res.status(StatusCodes.OK).json({
+        success: true,
+        message: "Record deleted successfully",
+        data: deleteRecord,
+      });
+    } catch (error) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
 }
 
 module.exports = new MaintenanceController();

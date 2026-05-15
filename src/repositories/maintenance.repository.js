@@ -177,6 +177,22 @@ class MaintenanceRepository {
       { new: true, runValidators: true },
     );
   }
+
+  async updateMaintenanceRecord(id, data) {
+    return await Maintenance.findByIdAndUpdate(
+      id,
+      { $set: data },
+      { new: true, runValidators: true },
+    );
+  }
+
+  async deleteMaintenance(id) {
+    return Maintenance.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true },
+    );
+  }
 }
 
 module.exports = new MaintenanceRepository();

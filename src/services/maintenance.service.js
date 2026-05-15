@@ -135,6 +135,33 @@ class MaintenanceService {
       throw error;
     }
   }
+
+  async updateData(id, data) {
+    try {
+      const updatedRecord = await maintenanceRepository.updateMaintenanceRecord(
+        id,
+        data,
+      );
+      return updatedRecord;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async softdelete(id) {
+    try {
+      const deleteRecord = await maintenanceRepository.deleteMaintenance(id);
+      if (!deleteRecord) {
+        throw {
+          status: StatusCodes.NOT_FOUND,
+          message: "Maintenance not found",
+        };
+      }
+      return deleteRecord;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 module.exports = new MaintenanceService();

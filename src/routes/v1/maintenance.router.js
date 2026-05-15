@@ -26,4 +26,18 @@ router.patch(
   maintenanceController.updateStatus,
 );
 
+router.put(
+  "/maintananace/:id",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  maintenanceController.updateMaintenanceRecord,
+);
+
+router.delete(
+  "/maintananace/:id",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  maintenanceController.deleteRecord,
+);
+
 module.exports = router;
