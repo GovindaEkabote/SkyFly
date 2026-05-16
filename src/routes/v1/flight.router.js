@@ -13,4 +13,16 @@ router.post(
     flightController.createFlight,
 );
 
+router.get(
+    '/get/flight/:id',
+    token,
+    flightController.getFlightById,
+);
+
+router.get(
+    '/search/flights',
+    token,
+    flightController.searchFlights,
+);
+
 module.exports = router;
