@@ -6,6 +6,7 @@ const airlineRoutes = require("./v1/airline.router");
 const airportRoutes = require("./v1/airport.router");
 const maintananceRoutes = require("./v1/maintenance.router");
 const aircraftRoutes = require("./v1/aircraft.router");
+const flightRoutes = require("./v1/flight.router");
 const router = express.Router();
 
 router.use("/v1", authRoutes);
@@ -16,5 +17,6 @@ router.use("/v1", airportRoutes);
 router.use("/v1", airportRoutes);
 router.use("/v1", maintananceRoutes);
 router.use("/v1", aircraftRoutes);
+router.use("/v1", flightRoutes);
 
 module.exports = router;

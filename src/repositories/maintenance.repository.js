@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const { Maintenance, Airline, Aircraft } = require("../models/index");
 const { constant, maintenanceStatus } = require("../utils");
 
@@ -11,7 +12,7 @@ class MaintenanceRepository {
     return await Maintenance.findById(id)
       .populate("airline", "code name status")
       .populate("aircraft", "registration model manufacturer")
-      .populate("createdBy", "name  email");
+      .populate("createdBy", "name email");
   }
 
   async updateStatus(id, status, additionalData = {}) {
@@ -35,7 +36,7 @@ class MaintenanceRepository {
           const duration =
             (new Date() - maintenanceRecord.startDate) / (1000 * 60 * 60); // Duration in hours
 
-          updateData.duration = Math.round(duration * 10) / 10; // Round to 2 decimal places
+          updateData.duration = Math.round(duration * 10) / 10; // Round to 1 decimal place
         }
       }
 
@@ -108,14 +109,11 @@ class MaintenanceRepository {
     try {
       const query = {
         aircraft: aircraftId,
-
         status: {
           $in: [maintenanceStatus.scheduled, maintenanceStatus.in_progress],
         },
-
         scheduledDate: {
           $gte: new Date(scheduledDate),
-
           $lt: new Date(
             new Date(scheduledDate).setDate(
               new Date(scheduledDate).getDate() + 1,
@@ -133,6 +131,7 @@ class MaintenanceRepository {
       throw error;
     }
   }
+
   async validateReferences(airlineId, aircraftId) {
     try {
       const [airline, aircraft] = await Promise.all([
@@ -144,7 +143,7 @@ class MaintenanceRepository {
         airlineExists: !!airline && !airline.isDeleted,
         aircraftExists: !!aircraft && !aircraft.isDeleted,
         aircraftBelongsToAirline:
-          aircraft && aircraft.airline.toString() === airlineId.toString(),
+          aircraft && aircraft.airline?.toString() === airlineId?.toString(),
       };
     } catch (error) {
       throw error;
@@ -156,8 +155,8 @@ class MaintenanceRepository {
   }
 
   async findAllMaintenance(skip, limit) {
-    return await Maintenance.find()
-      .populate("createdBy", "name  email")
+    return await Maintenance.find({ isDeleted: false })
+      .populate("createdBy", "name email")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -167,15 +166,7 @@ class MaintenanceRepository {
     return await Maintenance.findById(id)
       .populate("airline", "code name status")
       .populate("aircraft", "registration model manufacturer")
-      .populate("createdBy", "name  email");
-  }
-
-  async updateStatus(id, status) {
-    return await Maintenance.findByIdAndUpdate(
-      id,
-      { $set: { status } },
-      { new: true, runValidators: true },
-    );
+      .populate("createdBy", "name email");
   }
 
   async updateMaintenanceRecord(id, data) {
@@ -195,8 +186,7 @@ class MaintenanceRepository {
   }
 
   async findByAirline(airlineId, filters = {}, pagination = {}) {
-    const { status, type, priority, startDate, endDate, minCost, maxCost } =
-      filters;
+    const { status, type, priority, startDate, endDate, minCost, maxCost } = filters;
     const { page = 1, limit = 10 } = pagination;
     const query = {
       airline: airlineId,
@@ -237,6 +227,7 @@ class MaintenanceRepository {
       },
     };
   }
+
   async getSummaryByAirline(airlineId) {
     const matchStage = {
       airline: new mongoose.Types.ObjectId(airlineId),
@@ -291,7 +282,7 @@ class MaintenanceRepository {
           },
           completionRate: {
             $multiply: [
-              { $divide: ["$completedCount", "$totalMaintenances"] },
+              { $divide: ["$completedCount", { $max: ["$totalMaintenances", 1] }] },
               100,
             ],
           },
@@ -347,9 +338,6 @@ class MaintenanceRepository {
     ]);
   }
 
-  /**
-   * Get upcoming maintenance records
-   */
   async getUpcomingMaintenance(airlineId, daysAhead = 30) {
     const today = new Date();
     const futureDate = new Date();
@@ -365,9 +353,6 @@ class MaintenanceRepository {
       .sort({ scheduledDate: 1 });
   }
 
-  /**
-   * Get overdue maintenance records
-   */
   async getOverdueMaintenance(airlineId) {
     return await Maintenance.find({
       airline: new mongoose.Types.ObjectId(airlineId),
@@ -378,5 +363,181 @@ class MaintenanceRepository {
       .populate("aircraft", "registration model")
       .sort({ scheduledDate: 1 });
   }
+
+  async findByAirlineMaintenance(airlineId, filters = {}, pagination = {}) {
+    const { status, type, priority, startDate, endDate, search } = filters;
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = "scheduledDate",
+      sortOrder = "desc",
+    } = pagination;
+
+    const query = {
+      airline: new mongoose.Types.ObjectId(airlineId),
+      isDeleted: false,
+    };
+
+    // Apply filters
+    if (status) query.status = status;
+    if (type) query.type = type;
+    if (priority) query.priority = priority;
+
+    if (startDate || endDate) {
+      query.scheduledDate = {};
+      if (startDate) query.scheduledDate.$gte = new Date(startDate);
+      if (endDate) query.scheduledDate.$lte = new Date(endDate);
+    }
+
+    if (search) {
+      query.$or = [
+        { "assignedTo.engineer": { $regex: search, $options: "i" } },
+        { "assignedTo.company": { $regex: search, $options: "i" } },
+        { notes: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    const skip = (page - 1) * limit;
+    const sortOptions = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
+
+    const [data, total] = await Promise.all([
+      Maintenance.find(query)
+        .populate("aircraft", "registration model manufacturer")
+        .populate("createdBy", "name email")
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      Maintenance.countDocuments(query),
+    ]);
+
+    return {
+      data,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page * limit < total,
+        hasPrevPage: page > 1,
+      },
+    };
+  }
+
+  async getMaintenanceSummary(airlineId) {
+    const pipeline = [
+      { $match: { airline: new mongoose.Types.ObjectId(airlineId), isDeleted: false } },
+      {
+        $group: {
+          _id: null,
+          totalMaintenance: { $sum: 1 },
+          completedCount: {
+            $sum: { $cond: [{ $eq: ["$status", "completed"] }, 1, 0] },
+          },
+          inProgressCount: {
+            $sum: { $cond: [{ $eq: ["$status", "in_progress"] }, 1, 0] },
+          },
+          scheduledCount: {
+            $sum: { $cond: [{ $eq: ["$status", "scheduled"] }, 1, 0] },
+          },
+          delayedCount: {
+            $sum: { $cond: [{ $eq: ["$status", "delayed"] }, 1, 0] },
+          },
+          totalCost: { $sum: "$cost.actual" },
+          totalEstimatedCost: { $sum: "$cost.estimated" },
+          avgDuration: { $avg: "$duration" },
+          criticalPriority: {
+            $sum: { $cond: [{ $eq: ["$priority", "critical"] }, 1, 0] },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalMaintenance: 1,
+          completedCount: 1,
+          inProgressCount: 1,
+          scheduledCount: 1,
+          delayedCount: 1,
+          totalCost: { $ifNull: ["$totalCost", 0] },
+          totalEstimatedCost: { $ifNull: ["$totalEstimatedCost", 0] },
+          avgDuration: { $ifNull: ["$avgDuration", 0] },
+          criticalPriority: 1,
+          completionRate: {
+            $multiply: [
+              {
+                $divide: [
+                  "$completedCount",
+                  { $max: ["$totalMaintenance", 1] },
+                ],
+              },
+              100,
+            ],
+          },
+        },
+      },
+    ];
+
+    const result = await Maintenance.aggregate(pipeline);
+    return (
+      result[0] || {
+        totalMaintenance: 0,
+        completedCount: 0,
+        inProgressCount: 0,
+        scheduledCount: 0,
+        delayedCount: 0,
+        totalCost: 0,
+        totalEstimatedCost: 0,
+        avgDuration: 0,
+        criticalPriority: 0,
+        completionRate: 0,
+      }
+    );
+  }
+
+  async findByStatus(airlineId, status) {
+    return await Maintenance.find({
+      airline: new mongoose.Types.ObjectId(airlineId),
+      status,
+      isDeleted: false,
+    })
+      .populate("aircraft", "registration model")
+      .sort({ scheduledDate: 1 })
+      .lean();
+  }
+
+  async getCostAnalysis(airlineId) {
+    const pipeline = [
+      { $match: { airline: new mongoose.Types.ObjectId(airlineId), isDeleted: false } },
+      {
+        $group: {
+          _id: "$type",
+          count: { $sum: 1 },
+          totalActualCost: { $sum: "$cost.actual" },
+          totalEstimatedCost: { $sum: "$cost.estimated" },
+          avgDuration: { $avg: "$duration" }
+        }
+      },
+      {
+        $project: {
+          type: "$_id",
+          count: 1,
+          totalActualCost: { $ifNull: ["$totalActualCost", 0] },
+          totalEstimatedCost: { $ifNull: ["$totalEstimatedCost", 0] },
+          avgDuration: { $ifNull: ["$avgDuration", 0] },
+          costVariance: {
+            $subtract: [
+              { $ifNull: ["$totalActualCost", 0] },
+              { $ifNull: ["$totalEstimatedCost", 0] }
+            ]
+          }
+        }
+      },
+      { $sort: { totalActualCost: -1 } }
+    ];
+
+    return await Maintenance.aggregate(pipeline);
+  }
 }
+
 module.exports = new MaintenanceRepository();

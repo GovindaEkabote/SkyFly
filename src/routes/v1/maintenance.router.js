@@ -46,4 +46,28 @@ router.get(
   maintenanceController.getAirlineMaintenances,
 );
 
+router.get(
+  "/airlines/:airlineId/maintenance/summary",
+  token,
+  maintenanceController.getMaintenanceSummary,
+);
+
+router.get(
+  "/airlines/:airlineId/maintenance/status/:status",
+  token,
+  maintenanceController.getMaintenanceByStatus,
+);
+
+router.get(
+  "/airlines/:airlineId/maintenance/export",
+  token,
+  maintenanceController.exportMaintenanceRecords,
+);
+
+router.get(
+  "/airlines/:airlineId/maintenance/upcoming",
+  token,
+  maintenanceController.getUpcomingMaintenance,
+);
+
 module.exports = router;

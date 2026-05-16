@@ -1,5 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 const { maintenanceService } = require("../services/index");
+const { maintenanceRepository } = require("../repositories/index");
 
 class MaintenanceController {
   async createMaintenance(req, res, next) {
@@ -182,6 +183,111 @@ class MaintenanceController {
       filters: result.filters,
       timestamp: new Date().toISOString(),
     });
+  }
+
+  async getAirlineMaintenanceRecords(req, res, next) {
+    try {
+      const { airlineId } = req.params;
+      const queryParams = req.query;
+
+      const result = await maintenanceService.getAirlineMaintenanceRecords(
+        airlineId,
+        queryParams,
+      );
+
+      res.status(200).json({
+        status: "success",
+        message: "Maintenance records retrieved successfully",
+        data: result.data,
+        pagination: result.pagination,
+        filters: result.filters,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getMaintenanceSummary(req, res, next) {
+    try {
+      const { airlineId } = req.params;
+
+      const result = await maintenanceService.getMaintenanceSummary(airlineId);
+
+      res.status(200).json({
+        status: "success",
+        message: "Maintenance summary retrieved successfully",
+        data: result,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getMaintenanceByStatus(req, res, next) {
+    try {
+      const { airlineId, status } = req.params;
+
+      const result = await maintenanceService.getMaintenanceByStatus(
+        airlineId,
+        status,
+      );
+
+      res.status(200).json({
+        status: "success",
+        message: `Maintenance records with status '${status}' retrieved successfully`,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async exportMaintenanceRecords(req, res, next) {
+    try {
+      const { airlineId } = req.params;
+      const filters = req.query;
+
+      const result = await maintenanceService.exportMaintenanceRecords(
+        airlineId,
+        filters,
+      );
+
+      res.status(200).json({
+        status: "success",
+        message: "Maintenance records exported successfully",
+        data: {
+          totalRecords: result.totalRecords,
+          records: result.data,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async getUpcomingMaintenance(req, res, next) {
+    try {
+      const { airlineId } = req.params;
+      const { days = 30 } = req.query;
+
+      // This would need a new service method
+      const upcoming = await maintenanceRepository.getUpcomingMaintenance(
+        airlineId,
+        parseInt(days),
+      );
+
+      res.status(200).json({
+        status: "success",
+        message: `Upcoming maintenance for next ${days} days retrieved successfully`,
+        data: {
+          days: parseInt(days),
+          count: upcoming.length,
+          records: upcoming,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 }
 

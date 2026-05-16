@@ -1,4 +1,7 @@
+const mongoose = require("mongoose");
+const { StatusCodes } = require("http-status-codes");
 const { maintenanceRepository } = require("../repositories/index");
+const {maintenanceStatus} = require("../utils");
 const { Airline } = require("../models/index");
 
 class MaintenanceService {
@@ -103,7 +106,8 @@ class MaintenanceService {
         pagination: {
           page: Number(page),
           limit: Number(limit),
-          totalRecords: Math.ceil(totalRecords / limit),
+          totalRecords: totalRecords,
+          totalPages: Math.ceil(totalRecords / limit),
           hasNext: page * limit < totalRecords,
           hasPrev: page > 1,
         },
@@ -168,7 +172,7 @@ class MaintenanceService {
     // Validate airline exists
     const airline = await Airline.findById(airlineId);
     if (!airline) {
-      throw new AppError("Airline not found", 404);
+      throw new Error("Airline not found");
     }
 
     // Extract filters from query params
@@ -191,8 +195,6 @@ class MaintenanceService {
     const pagination = {
       page: queryParams.page,
       limit: queryParams.limit,
-      sortBy: queryParams.sortBy,
-      sortOrder: queryParams.sortOrder,
     };
 
     // Get maintenance records
@@ -217,6 +219,172 @@ class MaintenanceService {
       filters,
       summary,
       ...result,
+    };
+  }
+
+  async getAirlineMaintenanceRecords(airlineId, queryParams) {
+    // Validate airline ID
+    if (!mongoose.Types.ObjectId.isValid(airlineId)) {
+      throw new Error("Invalid airline ID format");
+    }
+
+    // Extract pagination parameters
+    const pagination = {
+      page: parseInt(queryParams.page) || 1,
+      limit: Math.min(parseInt(queryParams.limit) || 10, 100), // Max 100 records
+      sortBy: queryParams.sortBy || "scheduledDate",
+      sortOrder: queryParams.sortOrder || "desc",
+    };
+
+    // Validate sortBy field
+    const allowedSortFields = [
+      "scheduledDate",
+      "createdAt",
+      "duration",
+      "cost.actual",
+    ];
+    if (!allowedSortFields.includes(pagination.sortBy)) {
+      pagination.sortBy = "scheduledDate";
+    }
+
+    // Extract filters
+    const filters = {
+      status: queryParams.status,
+      type: queryParams.type,
+      priority: queryParams.priority,
+      startDate: queryParams.startDate,
+      endDate: queryParams.endDate,
+      search: queryParams.search,
+    };
+
+    // Remove undefined filters
+    Object.keys(filters).forEach(
+      (key) => filters[key] === undefined && delete filters[key],
+    );
+
+    // Validate enum values
+    const validStatuses = [
+      "scheduled",
+      "in_progress",
+      "completed",
+      "delayed",
+      "cancelled",
+    ];
+    if (filters.status && !validStatuses.includes(filters.status)) {
+      throw new Error(
+        `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
+      );
+    }
+
+    const validTypes = [
+      "A_check",
+      "C_check",
+      "engine_overhaul",
+      "landing_gear",
+      "avionics",
+      "emergency",
+      "scheduled",
+    ];
+    if (filters.type && !validTypes.includes(filters.type)) {
+      throw new Error(`Invalid type. Must be one of: ${validTypes.join(", ")}`);
+    }
+
+    const validPriorities = ["low", "medium", "high", "critical"];
+    if (filters.priority && !validPriorities.includes(filters.priority)) {
+      throw new Error(
+        `Invalid priority. Must be one of: ${validPriorities.join(", ")}`,
+      );
+    }
+
+    // Get maintenance records
+    const result = await maintenanceRepository.findByAirlineMaintenance(
+      airlineId,
+      filters,
+      pagination,
+    );
+
+    return {
+      success: true,
+      data: result.data,
+      pagination: result.pagination,
+      filters: filters,
+    };
+  }
+
+  async getMaintenanceSummary(airlineId) {
+    if (!mongoose.Types.ObjectId.isValid(airlineId)) {
+      throw new Error("Invalid airline ID format");
+    }
+
+    const [summary, upcomingMaintenance, costAnalysis] = await Promise.all([
+      maintenanceRepository.getMaintenanceSummary(airlineId),
+      maintenanceRepository.getUpcomingMaintenance(airlineId, 30),
+      maintenanceRepository.getCostAnalysis(airlineId),
+    ]);
+
+    return {
+      success: true,
+      summary,
+      upcomingCount: upcomingMaintenance.length,
+      costAnalysis,
+      nextMaintenanceDue: upcomingMaintenance[0] || null,
+    };
+  }
+
+  async getMaintenanceByStatus(airlineId, status) {
+    if (!mongoose.Types.ObjectId.isValid(airlineId)) {
+      throw new Error("Invalid airline ID format");
+    }
+
+    const validStatuses = [
+      maintenanceStatus.scheduled,
+      maintenanceStatus.in_progress,
+      maintenanceStatus.completed,
+      maintenanceStatus.delayed,
+      maintenanceStatus.cancelled,
+    ];
+    if (!validStatuses.includes(status)) {
+      throw new Error(
+        `Invalid status. Must be one of: ${validStatuses.join(", ")}`,
+      );
+    }
+
+    const records = await maintenanceRepository.findByStatus(airlineId, status);
+
+    return {
+      success: true,
+      status,
+      count: records.length,
+      data: records,
+    };
+  }
+
+  async exportMaintenanceRecords(airlineId, filters = {}) {
+    const result = await maintenanceRepository.findByAirline(
+      airlineId,
+      filters,
+      { limit: 1000 },
+    );
+
+    const csvData = result.data.map((record) => ({
+      Aircraft: record.aircraft?.registration || "N/A",
+      Model: record.aircraft?.model || "N/A",
+      Type: record.type,
+      Status: record.status,
+      Priority: record.priority,
+      "Scheduled Date": record.scheduledDate?.toISOString().split("T")[0],
+      "Completion Date":
+        record.completionDate?.toISOString().split("T")[0] || "Pending",
+      "Duration (hours)": record.duration || 0,
+      "Actual Cost": record.cost?.actual || 0,
+      "Estimated Cost": record.cost?.estimated || 0,
+      Engineer: record.assignedTo?.engineer || "Not assigned",
+    }));
+
+    return {
+      success: true,
+      data: csvData,
+      totalRecords: result.pagination.total,
     };
   }
 }

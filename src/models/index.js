@@ -5,6 +5,7 @@ const otpModel = require("./otp.model");
 const tokenModel = require("./token-model");
 const user = require("./user-model");
 const aircraftModel = require("./aircraft.model");
+const flight = require("./flight.model");
 
 module.exports = {
   User: user,
@@ -14,4 +15,5 @@ module.exports = {
   Airport: airportModel,
   Maintenance: maintenanceModel,
   Aircraft: aircraftModel,
+  Flight: flight,
 };
