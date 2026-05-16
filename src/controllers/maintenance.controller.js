@@ -120,6 +120,69 @@ class MaintenanceController {
       });
     }
   }
+
+  async getAirlineMaintenances(req, res, next) {
+    const { airlineId } = req.params;
+    const queryParams = req.query;
+
+    // Validate pagination parameters
+    if (queryParams.page && (queryParams.page < 1 || isNaN(queryParams.page))) {
+      return next(new AppError("Page must be a positive number", 400));
+    }
+
+    if (
+      queryParams.limit &&
+      (queryParams.limit < 1 || queryParams.limit > 100)
+    ) {
+      return next(new AppError("Limit must be between 1 and 100", 400));
+    }
+
+    // Validate status filter
+    const validStatuses = [
+      "scheduled",
+      "in_progress",
+      "completed",
+      "delayed",
+      "cancelled",
+    ];
+    if (queryParams.status && !validStatuses.includes(queryParams.status)) {
+      return next(
+        new AppError(`Status must be one of: ${validStatuses.join(", ")}`, 400),
+      );
+    }
+
+    // Validate type filter
+    const validTypes = [
+      "A_check",
+      "C_check",
+      "engine_overhaul",
+      "landing_gear",
+      "avionics",
+      "emergency",
+      "scheduled",
+    ];
+    if (queryParams.type && !validTypes.includes(queryParams.type)) {
+      return next(
+        new AppError(`Type must be one of: ${validTypes.join(", ")}`, 400),
+      );
+    }
+
+    // Get maintenance records
+    const result = await maintenanceService.getAirlineMaintenances(
+      airlineId,
+      queryParams,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Maintenance records retrieved successfully",
+      data: result.data,
+      pagination: result.pagination,
+      summary: result.summary,
+      filters: result.filters,
+      timestamp: new Date().toISOString(),
+    });
+  }
 }
 
 module.exports = new MaintenanceController();

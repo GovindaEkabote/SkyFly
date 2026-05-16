@@ -193,6 +193,190 @@ class MaintenanceRepository {
       { new: true },
     );
   }
-}
 
+  async findByAirline(airlineId, filters = {}, pagination = {}) {
+    const { status, type, priority, startDate, endDate, minCost, maxCost } =
+      filters;
+    const { page = 1, limit = 10 } = pagination;
+    const query = {
+      airline: airlineId,
+      isDeleted: false,
+    };
+    if (status) query.status = status;
+    if (type) query.type = type;
+    if (priority) query.priority = priority;
+    if (startDate || endDate) {
+      query.scheduledDate = {};
+      if (startDate) query.scheduledDate.$gte = new Date(startDate);
+      if (endDate) query.scheduledDate.$lte = new Date(endDate);
+    }
+    if (minCost || maxCost) {
+      query.cost = {};
+      if (minCost) query.cost.$gte = Number(minCost);
+      if (maxCost) query.cost.$lte = Number(maxCost);
+    }
+    const skip = (page - 1) * limit;
+    const [maintenances, total] = await Promise.all([
+      Maintenance.find(query)
+        .populate("aircraft", "registration model manufacturer")
+        .populate("createdBy", "name email")
+        .skip(skip)
+        .limit(parseInt(limit)),
+      Maintenance.countDocuments(query),
+    ]);
+
+    return {
+      data: maintenances,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page * limit < total,
+        hasPrevPage: page > 1,
+      },
+    };
+  }
+  async getSummaryByAirline(airlineId) {
+    const matchStage = {
+      airline: new mongoose.Types.ObjectId(airlineId),
+      isDeleted: false,
+    };
+
+    const summary = await Maintenance.aggregate([
+      { $match: matchStage },
+      {
+        $group: {
+          _id: null,
+          totalMaintenances: { $sum: 1 },
+          totalActualCost: { $sum: "$cost.actual" },
+          totalEstimatedCost: { $sum: "$cost.estimated" },
+          averageDuration: { $avg: "$duration" },
+          completedCount: {
+            $sum: { $cond: [{ $eq: ["$status", "completed"] }, 1, 0] },
+          },
+          inProgressCount: {
+            $sum: { $cond: [{ $eq: ["$status", "in_progress"] }, 1, 0] },
+          },
+          scheduledCount: {
+            $sum: { $cond: [{ $eq: ["$status", "scheduled"] }, 1, 0] },
+          },
+          delayedCount: {
+            $sum: { $cond: [{ $eq: ["$status", "delayed"] }, 1, 0] },
+          },
+          cancelledCount: {
+            $sum: { $cond: [{ $eq: ["$status", "cancelled"] }, 1, 0] },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalMaintenances: 1,
+          totalActualCost: { $ifNull: ["$totalActualCost", 0] },
+          totalEstimatedCost: { $ifNull: ["$totalEstimatedCost", 0] },
+          costVariance: {
+            $subtract: [
+              { $ifNull: ["$totalActualCost", 0] },
+              { $ifNull: ["$totalEstimatedCost", 0] },
+            ],
+          },
+          averageDuration: { $ifNull: ["$averageDuration", 0] },
+          statusBreakdown: {
+            completed: "$completedCount",
+            inProgress: "$inProgressCount",
+            scheduled: "$scheduledCount",
+            delayed: "$delayedCount",
+            cancelled: "$cancelledCount",
+          },
+          completionRate: {
+            $multiply: [
+              { $divide: ["$completedCount", "$totalMaintenances"] },
+              100,
+            ],
+          },
+        },
+      },
+    ]);
+
+    return (
+      summary[0] || {
+        totalMaintenances: 0,
+        totalActualCost: 0,
+        totalEstimatedCost: 0,
+        costVariance: 0,
+        averageDuration: 0,
+        statusBreakdown: {
+          completed: 0,
+          inProgress: 0,
+          scheduled: 0,
+          delayed: 0,
+          cancelled: 0,
+        },
+        completionRate: 0,
+      }
+    );
+  }
+
+  async getBreakdownByType(airlineId) {
+    return await Maintenance.aggregate([
+      {
+        $match: {
+          airline: new mongoose.Types.ObjectId(airlineId),
+          isDeleted: false,
+        },
+      },
+      {
+        $group: {
+          _id: "$type",
+          count: { $sum: 1 },
+          totalCost: { $sum: "$cost.actual" },
+          averageDuration: { $avg: "$duration" },
+        },
+      },
+      {
+        $project: {
+          type: "$_id",
+          count: 1,
+          totalCost: 1,
+          averageDuration: 1,
+          _id: 0,
+        },
+      },
+      { $sort: { count: -1 } },
+    ]);
+  }
+
+  /**
+   * Get upcoming maintenance records
+   */
+  async getUpcomingMaintenance(airlineId, daysAhead = 30) {
+    const today = new Date();
+    const futureDate = new Date();
+    futureDate.setDate(today.getDate() + daysAhead);
+
+    return await Maintenance.find({
+      airline: new mongoose.Types.ObjectId(airlineId),
+      scheduledDate: { $gte: today, $lte: futureDate },
+      status: "scheduled",
+      isDeleted: false,
+    })
+      .populate("aircraft", "registration model")
+      .sort({ scheduledDate: 1 });
+  }
+
+  /**
+   * Get overdue maintenance records
+   */
+  async getOverdueMaintenance(airlineId) {
+    return await Maintenance.find({
+      airline: new mongoose.Types.ObjectId(airlineId),
+      scheduledDate: { $lt: new Date() },
+      status: { $in: ["scheduled", "in_progress"] },
+      isDeleted: false,
+    })
+      .populate("aircraft", "registration model")
+      .sort({ scheduledDate: 1 });
+  }
+}
 module.exports = new MaintenanceRepository();

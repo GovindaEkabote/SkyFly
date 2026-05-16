@@ -40,4 +40,10 @@ router.delete(
   maintenanceController.deleteRecord,
 );
 
+router.get(
+  "/airlines/:airlineId/maintananace",
+  token,
+  maintenanceController.getAirlineMaintenances,
+);
+
 module.exports = router;

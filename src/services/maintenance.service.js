@@ -1,4 +1,5 @@
 const { maintenanceRepository } = require("../repositories/index");
+const { Airline } = require("../models/index");
 
 class MaintenanceService {
   async createMaintenance(maintenanceData, userId) {
@@ -161,6 +162,62 @@ class MaintenanceService {
     } catch (error) {
       throw error;
     }
+  }
+
+  async getAirlineMaintenances(airlineId, queryParams) {
+    // Validate airline exists
+    const airline = await Airline.findById(airlineId);
+    if (!airline) {
+      throw new AppError("Airline not found", 404);
+    }
+
+    // Extract filters from query params
+    const filters = {
+      status: queryParams.status,
+      type: queryParams.type,
+      priority: queryParams.priority,
+      startDate: queryParams.startDate,
+      endDate: queryParams.endDate,
+      minCost: queryParams.minCost,
+      maxCost: queryParams.maxCost,
+    };
+
+    // Remove undefined filters
+    Object.keys(filters).forEach(
+      (key) => filters[key] === undefined && delete filters[key],
+    );
+
+    // Pagination params
+    const pagination = {
+      page: queryParams.page,
+      limit: queryParams.limit,
+      sortBy: queryParams.sortBy,
+      sortOrder: queryParams.sortOrder,
+    };
+
+    // Get maintenance records
+    const result = await maintenanceRepository.findByAirline(
+      airlineId,
+      filters,
+      pagination,
+    );
+
+    // Get summary statistics (optional, can be separate endpoint)
+    let summary = null;
+    if (queryParams.includeSummary === "true") {
+      summary = await maintenanceRepository.getSummaryByAirline(airlineId);
+    }
+
+    return {
+      airline: {
+        id: airline._id,
+        name: airline.name,
+        code: airline.code,
+      },
+      filters,
+      summary,
+      ...result,
+    };
   }
 }
 
