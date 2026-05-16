@@ -1,6 +1,6 @@
 const { Flight } = require("../models/index");
 const { Airline } = require("../models/index");
-const {Aircraft} = require("../models/index");
+const { Aircraft } = require("../models/index");
 const { Airport } = require("../models/index");
 
 class FlightRepository {
@@ -56,6 +56,14 @@ class FlightRepository {
       .populate("route.destination.airport", "name code");
 
     return flights;
+  }
+
+  countFlights() {
+    return Flight.countDocuments();
+  }
+
+  async getFlights(skip, limit) {
+    return await Flight.find().skip(skip).limit(limit);
   }
 }
 

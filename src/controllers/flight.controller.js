@@ -31,32 +31,42 @@ class FlightController {
     }
   }
 
-async searchFlights(req, res) {
-  try {
-    const { query } = req.query;
+  async searchFlights(req, res, next) {
+    try {
+      const { query } = req.query;
 
-    const flights = await flightService.searchFlight(query);
+      const flights = await flightService.searchFlight(query);
 
-    return res.status(StatusCodes.OK).json(flights);
+      return res.status(StatusCodes.OK).json(flights);
+    } catch (error) {
+      if (error.message === "Query parameter is required") {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+          error: error.message,
+        });
+      }
 
-  } catch (error) {
+      if (error.message === "No flights found matching the query") {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          error: error.message,
+        });
+      }
 
-    if (error.message === "Query parameter is required") {
-      return res.status(StatusCodes.BAD_REQUEST).json({
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         error: error.message,
       });
     }
-
-    if (error.message === "No flights found matching the query") {
-      return res.status(StatusCodes.NOT_FOUND).json({
-        error: error.message,
-      });
-    }
-
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      error: error.message,
-    });
   }
-}
+
+  async getFlights(req, res, next) {
+    try {
+      const { page = 1, limit = 10 } = req.query;
+      const result = await flightService.getFlights(page, limit);
+      res.status(StatusCodes.OK).json(result);
+    } catch (error) {
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  }
 }
 module.exports = new FlightController();

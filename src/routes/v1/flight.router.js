@@ -25,4 +25,10 @@ router.get(
     flightController.searchFlights,
 );
 
+router.get(
+    '/get/all/flights',
+    token,
+    flightController.getFlights,
+);
+
 module.exports = router;
