@@ -80,6 +80,17 @@ class FlightRepository {
       { new: true },
     );
   }
+
+  async rescheduleFlight(flightId, effectiveFrom, effectiveTo) {
+    return await Flight.findByIdAndUpdate(
+      flightId,
+      {
+        effectiveFrom,
+        effectiveTo,
+      },
+      { new: true },
+    );
+  }
 }
 
 module.exports = new FlightRepository();

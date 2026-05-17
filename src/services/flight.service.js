@@ -60,5 +60,25 @@ class FlightService {
     }
     return await flightRepository.updateFlightStatus(flightId, status);
   }
+
+  async rescheduleFlight(flightId, effectiveFrom, effectiveTo) {
+    const flight = await flightRepository.getFlightById(flightId);
+    if (!flight) {
+      throw new Error("Flight not found");
+    }
+
+    const now = new Date(effectiveFrom);
+    const to = new Date(effectiveTo);
+
+    if (now >= to) {
+      throw new Error(
+        "Effective To date must be greater than Effective From date",
+      );
+    }
+    if (flight.status === "cancelled") {
+      throw new Error("Flight is already cancelled");
+    }
+    return await flightRepository.rescheduleFlight(flightId, now, to);
+  }
 }
 module.exports = new FlightService();

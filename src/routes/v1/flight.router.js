@@ -31,4 +31,11 @@ router.patch(
   flightController.updateStatus,
 );
 
+router.patch(
+  "/update/flight/schedule/:flightId",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  flightController.rescheduleFlight,
+);
+
 module.exports = router;

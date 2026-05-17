@@ -97,5 +97,26 @@ class FlightController {
         .json({ error: error.message });
     }
   }
+
+  async rescheduleFlight(req, res, next) {
+    try {
+      const { flightId } = req.params;
+      const { effectiveFrom, effectiveTo } = req.body;
+      const updatedFlight = await flightService.rescheduleFlight(
+        flightId,
+        effectiveFrom,
+        effectiveTo,
+      );
+      return res.status(StatusCodes.OK).json({
+        success: true,
+        message: "Flight rescheduled successfully",
+        data: updatedFlight,
+      });
+    } catch (error) {
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  }
 }
 module.exports = new FlightController();
