@@ -1,34 +1,34 @@
-const express = require('express');
-const { constant } = require('../../utils');
-const { roleBasedAuth, token } = require('../../middlewares');
+const express = require("express");
+const { constant } = require("../../utils");
+const { roleBasedAuth, token } = require("../../middlewares");
 const router = express.Router();
-const { flightController } = require('../../controllers/index');
-
-
+const { flightController } = require("../../controllers/index");
 
 router.post(
-    '/create/flight',
-    token,
-    roleBasedAuth(constant.airline_admin, constant.super_admin),
-    flightController.createFlight,
+  "/create/flight",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  flightController.createFlight,
 );
 
-router.get(
-    '/get/flight/:id',
-    token,
-    flightController.getFlightById,
+router.get("/get/flight/:id", token, flightController.getFlightById);
+
+router.get("/search/flights", token, flightController.searchFlights);
+
+router.get("/get/all/flights", token, flightController.getFlights);
+
+router.patch(
+  "/assign/aircraft/:flightId",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  flightController.assignAircraft,
 );
 
-router.get(
-    '/search/flights',
-    token,
-    flightController.searchFlights,
-);
-
-router.get(
-    '/get/all/flights',
-    token,
-    flightController.getFlights,
+router.patch(
+  "/update/flight/status/:flightId",
+  token,
+  roleBasedAuth(constant.airline_admin, constant.super_admin),
+  flightController.updateStatus,
 );
 
 module.exports = router;

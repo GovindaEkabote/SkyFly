@@ -68,5 +68,34 @@ class FlightController {
         .json({ error: error.message });
     }
   }
+
+  async assignAircraft(req, res, next) {
+    try {
+      const { flightId } = req.params;
+      const { aircraftId } = req.body;
+      const updatedFlight = await flightService.assignAircraft(
+        flightId,
+        aircraftId,
+      );
+      res.status(StatusCodes.OK).json(updatedFlight);
+    } catch (error) {
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  }
+
+  async updateStatus(req, res, next) {
+    try {
+      const { flightId } = req.params;
+      const { status } = req.body;
+      const updatedFlight = await flightService.updateStatus(flightId, status);
+      res.status(StatusCodes.OK).json(updatedFlight);
+    } catch (error) {
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  }
 }
 module.exports = new FlightController();

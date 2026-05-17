@@ -38,5 +38,27 @@ class FlightService {
       },
     };
   }
+
+  async assignAircraft(flightId, aircraftId) {
+    const flight = await flightRepository.getFlightById(flightId);
+    if (!flight) {
+      throw new Error("Flight not found");
+    }
+    if (!aircraftId) {
+      throw new Error("Aircraft ID is required");
+    }
+    return await flightRepository.assignAircraft(flightId, aircraftId);
+  }
+
+  async updateStatus(flightId, status) {
+    const flight = await flightRepository.getFlightById(flightId);
+    if (!flight) {
+      throw new Error("Flight not found");
+    }
+    if (!status) {
+      throw new Error("Status is required");
+    }
+    return await flightRepository.updateFlightStatus(flightId, status);
+  }
 }
 module.exports = new FlightService();

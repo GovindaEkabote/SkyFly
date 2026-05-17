@@ -61,9 +61,24 @@ class FlightRepository {
   countFlights() {
     return Flight.countDocuments();
   }
-
   async getFlights(skip, limit) {
     return await Flight.find().skip(skip).limit(limit);
+  }
+  //assign-aircraft
+  async assignAircraft(flightId, aircraftId) {
+    return await Flight.findByIdAndUpdate(
+      flightId,
+      { aircraft: aircraftId },
+      { new: true },
+    );
+  }
+
+  async updateFlightStatus(flightId, status) {
+    return await Flight.findByIdAndUpdate(
+      flightId,
+      { status: status },
+      { new: true },
+    );
   }
 }
 
